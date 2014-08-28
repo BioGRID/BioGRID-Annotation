@@ -1,0 +1,7 @@
+# Downloads, Ignore Everything Since They Are Gigantic
+*
+
+# Exceptions
+!.gitignore
+!README.md
+!*/
