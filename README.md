@@ -9,5 +9,5 @@ To use all of the tools contained within, you require at least the following:
 + Python 2.7+
 + MySQL 5.5+
 + wget
-+ Approximately 300 GB of Space (shared between database and downloaded files)
-+ At least 8 GB of memory (more is much better)
++ Approximately 300 GB of HD Space (shared between database and downloaded files)
++ At least 8 GB of Memory (more is much better)
