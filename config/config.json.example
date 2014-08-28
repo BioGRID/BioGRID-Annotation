@@ -1,11 +1,15 @@
 {
 	"PATHS" : {
-		"DOWNLOAD_DIRECTORY" 		: "PATH_TO_DOWNLOAD_TO",
+		"DOWNLOAD_DIRECTORY" 		: "downloads",
 		"ENTREZ_GENE_DIR"			: "entrez_gene",
 		"REFSEQ_DIR" 				: "refseq",
 		"REFSEQ_PROTEIN_DIR"	 	: "protein",
 		"REFSEQ_DNA_DIR"	 		: "dna",
-		"UNIPROT_DIR"	 			: "uniprot"
+		"UNIPROT_DIR"	 			: "uniprot",
+		"CGD_DIR"					: "cgd",
+		"SGD_DIR"					: "sgd",
+		"PSI_DIR"					: "psi",
+		"GO_DIR"					: "go"
 	},
 	
 	"FILES" : {

@@ -1,5 +1,5 @@
 #!/bin/bash
-baseDir="~/Annotation-Downloads"
+baseDir="/home/stark/Annotation-Downloads"
 
 cd $baseDir/entrez_gene
 wget -m -nd ftp://ftp.ncbi.nih.gov/gene/DATA/gene_info.gz

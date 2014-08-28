@@ -1,0 +1,22 @@
+dr-xr-xr-x  10 ftp      anonymous     4096 Aug 28 05:02 ASN_BINARY
+dr-xr-xr-x  10 ftp      anonymous     4096 Aug 28 05:03 GENE_INFO
+lr--r--r--   1 ftp      anonymous        9 Feb 10  2012 README -> ../README
+-r--r--r--   1 ftp      anonymous     2643 Aug 24 05:00 README_ensembl
+-r--r--r--   1 ftp      anonymous 773442418 Aug 28 03:35 gene2accession.gz
+-r--r--r--   1 ftp      anonymous  9425827 Aug 28 03:27 gene2ensembl.gz
+-r--r--r--   1 ftp      anonymous 15899909 Aug 28 03:25 gene2go.gz
+-r--r--r--   1 ftp      anonymous 40374392 Aug 28 03:35 gene2pubmed.gz
+-r--r--r--   1 ftp      anonymous 452869063 Aug 28 03:30 gene2refseq.gz
+-r--r--r--   1 ftp      anonymous 17189211 Aug 27 07:29 gene2sts
+-r--r--r--   1 ftp      anonymous  9494664 Aug 27 23:03 gene2unigene
+-r--r--r--   1 ftp      anonymous  1221751 Aug 28 03:28 gene2vega.gz
+-r--r--r--   1 ftp      anonymous  9825097 Aug 28 03:26 gene_group.gz
+-r--r--r--   1 ftp      anonymous  8724961 Aug 28 03:23 gene_history.gz
+-r--r--r--   1 ftp      anonymous 267493898 Aug 28 03:30 gene_info.gz
+-r--r--r--   1 ftp      anonymous 422768339 Aug 28 04:03 gene_neighbors.gz
+-r--r--r--   1 ftp      anonymous 103210083 Aug 27 09:04 gene_refseq_uniprotkb_collab.gz
+-r--r--r--   1 ftp      anonymous     1275 Sep  6  2011 go_process.dtd
+-r--r--r--   1 ftp      anonymous     9789 Aug 20  2012 go_process.xml
+-r--r--r--   1 ftp      anonymous   637349 Aug 27 09:31 mim2gene_medgen
+dr-xr-xr-x   2 ftp      anonymous     4096 Aug 14  2012 misc
+-r--r--r--   1 ftp      anonymous      737 Jun  9  2011 stopwords_gene
