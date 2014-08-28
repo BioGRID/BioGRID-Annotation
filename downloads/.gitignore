@@ -4,3 +4,4 @@
 # Exceptions
 !.gitignore
 !README.md
+!*/
