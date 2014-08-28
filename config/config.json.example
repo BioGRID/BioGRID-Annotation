@@ -1,0 +1,29 @@
+{
+	"PATHS" : {
+		"DOWNLOAD_DIRECTORY" 		: "PATH_TO_DOWNLOAD_TO",
+		"ENTREZ_GENE_DIR"			: "entrez_gene",
+		"REFSEQ_DIR" 				: "refseq",
+		"REFSEQ_PROTEIN_DIR"	 	: "protein",
+		"REFSEQ_DNA_DIR"	 		: "dna",
+		"UNIPROT_DIR"	 			: "uniprot"
+	},
+	
+	"FILES" : {
+		"NCBI_GENEHISTORY" 			: "gene_history.gz",
+		"NCBI_GENEINFO" 			: "gene_info.gz",
+		"NCBI_GENE2ACCESSION" 		: "gene2accession.gz",
+		"NCBI_GENE2REFSEQ" 			: "gene2refseq.gz",
+		"NCBI_REFSEQ2UNIPROT" 		: "gene_refseq_uniprotkb_collab.gz",
+		"NCBI_GENE2GO" 				: "gene2go.gz",
+		"NCBI_GROUPS" 				: "gene_groups.gz",
+		"NCBI_GENE2ENSEMBL" 		: "gene2ensembl.gz",
+		"GO_DEFINITIONS" 			: "go_daily-termdb.obo-xml",
+		"UNIPROT_SWISSPROT"			: "uniprot_sprot.xml",
+		"UNIPROT_IDMAPPING" 		: "idmapping_selected.tab",
+		"UNIPROT_TREMBL" 			: "uniprot_trembl.xml.gz",
+		"UNIPROT_ISOFORMS" 			: "uniprot_sprot_varsplic.fasta.gz",
+		"PSI_DEFINITIONS" 			: "psi-mi25.obo",
+		"SGD_FEATURES" 				: "SGD_features.tab",
+		"CGD_FEATURES" 				: "C_albicans_SC5314_A22_current_chromosomal_feature.tab"
+	}
+}
