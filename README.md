@@ -30,4 +30,4 @@ Make sure you have a loaded copy of the annotation database tables to use for th
 
 3. Go to config/config.json and adjust the settings in here to point to your setup. Especially modify the paths and the database login credentials to match your current configuration.
 
-4. Run: python EG_parseGeneHistoryToStaging.py - This will load the gene history from ENTREZ_GENE into a staging table for later use.
+4. Run: **python EG_parseGeneHistoryToStaging.py** - This will load the gene history from ENTREZ_GENE into a staging table for later use.
