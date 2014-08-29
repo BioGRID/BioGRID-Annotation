@@ -9,25 +9,38 @@
 		"CGD_DIR"					: "cgd",
 		"SGD_DIR"					: "sgd",
 		"PSI_DIR"					: "psi",
-		"GO_DIR"					: "go"
+		"GO_DIR"					: "go",
+		"POMBASE_DIR"				: "pombase"
 	},
 	
 	"FILES" : {
-		"NCBI_GENEHISTORY" 			: "gene_history.gz",
-		"NCBI_GENEINFO" 			: "gene_info.gz",
-		"NCBI_GENE2ACCESSION" 		: "gene2accession.gz",
-		"NCBI_GENE2REFSEQ" 			: "gene2refseq.gz",
-		"NCBI_REFSEQ2UNIPROT" 		: "gene_refseq_uniprotkb_collab.gz",
-		"NCBI_GENE2GO" 				: "gene2go.gz",
-		"NCBI_GROUPS" 				: "gene_groups.gz",
-		"NCBI_GENE2ENSEMBL" 		: "gene2ensembl.gz",
+		"EG_GENEHISTORY" 			: "gene_history.gz",
+		"EG_GENEINFO" 				: "gene_info.gz",
+		"EG_GENE2ACCESSION" 		: "gene2accession.gz",
+		"EG_GENE2REFSEQ" 			: "gene2refseq.gz",
+		"EG_REFSEQ2UNIPROT" 		: "gene_refseq_uniprotkb_collab.gz",
+		"EG_GENE2GO" 				: "gene2go.gz",
+		"EG_GROUPS" 				: "gene_groups.gz",
+		"EG_GENE2ENSEMBL" 			: "gene2ensembl.gz",
 		"GO_DEFINITIONS" 			: "go_daily-termdb.obo-xml",
-		"UNIPROT_SWISSPROT"			: "uniprot_sprot.xml",
-		"UNIPROT_IDMAPPING" 		: "idmapping_selected.tab",
-		"UNIPROT_TREMBL" 			: "uniprot_trembl.xml.gz",
-		"UNIPROT_ISOFORMS" 			: "uniprot_sprot_varsplic.fasta.gz",
+		"UP_SWISSPROT"				: "uniprot_sprot.xml",
+		"UP_IDMAPPING" 				: "idmapping_selected.tab",
+		"UP_TREMBL" 				: "uniprot_trembl.xml.gz",
+		"UP_ISOFORMS" 				: "uniprot_sprot_varsplic.fasta.gz",
 		"PSI_DEFINITIONS" 			: "psi-mi25.obo",
 		"SGD_FEATURES" 				: "SGD_features.tab",
-		"CGD_FEATURES" 				: "C_albicans_SC5314_A22_current_chromosomal_feature.tab"
+		"CGD_FEATURES" 				: "C_albicans_SC5314_A22_current_chromosomal_feature.tab",
+		"POMBASE_FEATURES"			: "sysID2product.tsv"
+	},
+	
+	"DB" : {
+		"DB_HOST"					: "Database IP",
+		"DB_USER"					: "Database Username",
+		"DB_PASS"					: "Database Password",
+		"DB_NAME"					: "Core Database Name",
+		"DB_STAGING"				: "Staging Database Name",
+		"DB_STATS"					: "Stats Database Name",
+		"DB_QUICK"					: "Quick Database Name",
+		"DB_COMMIT_COUNT"			: 10000
 	}
 }
