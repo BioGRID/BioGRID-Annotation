@@ -36,6 +36,6 @@ cd ../refseq/protein
 rm -f *.faa
 wget -m -nd ftp://ftp.ncbi.nih.gov/refseq/release/complete/*.protein.faa.gz
 
-cd ../dna
+cd ../rna
 rm -f *.fna
 wget -m -nd ftp://ftp.ncbi.nih.gov/refseq/release/complete/*.rna.fna.gz

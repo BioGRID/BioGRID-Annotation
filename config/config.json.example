@@ -4,7 +4,7 @@
 		"ENTREZ_GENE_DIR"			: "entrez_gene",
 		"REFSEQ_DIR" 				: "refseq",
 		"REFSEQ_PROTEIN_DIR"	 	: "protein",
-		"REFSEQ_DNA_DIR"	 		: "dna",
+		"REFSEQ_RNA_DIR"	 		: "rna",
 		"UNIPROT_DIR"	 			: "uniprot",
 		"CGD_DIR"					: "cgd",
 		"SGD_DIR"					: "sgd",
