@@ -23,7 +23,7 @@
 		"EG_GROUPS" 				: "gene_groups.gz",
 		"EG_GENE2ENSEMBL" 			: "gene2ensembl.gz",
 		"GO_DEFINITIONS" 			: "go_daily-termdb.obo-xml",
-		"UP_SWISSPROT"				: "uniprot_sprot.xml",
+		"UP_SWISSPROT"				: "uniprot_sprot.xml.gz",
 		"UP_IDMAPPING" 				: "idmapping_selected.tab",
 		"UP_TREMBL" 				: "uniprot_trembl.xml.gz",
 		"UP_ISOFORMS" 				: "uniprot_sprot_varsplic.fasta.gz",

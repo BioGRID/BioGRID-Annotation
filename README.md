@@ -16,6 +16,7 @@ To use all of the tools contained within, you require at least the following:
 + MySQLdb
 + gzip
 + json
++ xml.sax
 
 ## Update Process
 
@@ -26,11 +27,11 @@ Make sure you have a loaded copy of the annotation database tables to use for th
 
 + Verify that all files are downloaded
 
-+  Go to config/config.json and adjust the settings in here to point to your setup. Especially modify the paths and the database login credentials to match your current configuration.
++  Go to config/config.json (or create this file modelled on the config.json.example file already in this directory) and adjust the settings in here to point to your setup. Especially modify the paths and the database login credentials to match your current configuration.
 
 #### Prepare Staging Database
 
-+ Run: **python EG_parseGeneHistoryToStaging.py** - This will load the gene history from ENTREZ_GENE into a staging table for later use.
++ Run: **python EG_parseGeneHistoryToStaging.py** - This will load the gene history from ENTREZ GENE into a staging table for later use.
 
-+ Run: **python UNIPROT_parseSwissProtAccessionsToStaging.py** - This will load all the SWISSPROT accession ids into a staging table so we can later quickly determine which ids are from swissprot and which are from TREMBL.
++ Run: **python UNIPROT_parseSwissProtAccessionsToStaging.py** - This will load all the SWISSPROT accession ids into a staging table so we can later quickly determine which ids are from SWISSPROT and which are from TREMBL.
 
