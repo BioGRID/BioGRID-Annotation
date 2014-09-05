@@ -4,13 +4,12 @@
 import MySQLdb
 import sys, string
 import Config
-import Database
 
 class CommonFunctions( ) :
 
-	def __init__( self ) :
-		self.db = Database.db
-		self.cursor = self.db.cursor( )
+	def __init__( self, db, cursor ) :
+		self.db = db
+		self.cursor = cursor
 		
 	def fetchOrganismList( self, isUniprot = False ) :
 		
@@ -26,9 +25,3 @@ class CommonFunctions( ) :
 			organismInfo[organism_id] = row
 
 		return organismInfo
-		
-	def __del__( self ) :
-		if self.cursor is not None :
-			self.cursor.close( )
-		if self.db is not None :
-			self.db.close( )

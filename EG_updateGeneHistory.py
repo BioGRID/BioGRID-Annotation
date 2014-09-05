@@ -10,20 +10,18 @@ import Database
 
 from classes import EntrezGene
 
-db = Database.db
-cursor = db.cursor( )
+with Database.db as cursor :
 
-entrezGene = EntrezGene.EntrezGene( )
+	entrezGene = EntrezGene.EntrezGene( Database.db, cursor )
 
-cursor.execute( "TRUNCATE TABLE " + Config.DB_STATS + ".gene_history" )
+	cursor.execute( "TRUNCATE TABLE " + Config.DB_STATS + ".gene_history" )
 
-cursor.execute( "SELECT gene_id, gene_source_id FROM " + Config.DB_NAME + ".genes WHERE gene_source='ENTREZ' AND gene_status='ACTIVE'" )
+	cursor.execute( "SELECT gene_id, gene_source_id FROM " + Config.DB_NAME + ".genes WHERE gene_source='ENTREZ' AND gene_status='ACTIVE'" )
 
-for row in cursor.fetchall( ) :
-	entrezGene.processGeneHistory( row[0], row[1] )
+	for row in cursor.fetchall( ) :
+		entrezGene.processGeneHistory( row[0], row[1] )
 
-cursor.execute( "INSERT INTO " + Config.DB_STATS + ".update_tracker VALUES ( '0', 'Entrez-Gene History', NOW( ) )" )
-db.commit( )
-
-cursor.close( )
-db.close( )
+	cursor.execute( "INSERT INTO " + Config.DB_STATS + ".update_tracker VALUES ( '0', 'Entrez-Gene History', NOW( ) )" )
+	Database.db.commit( )
+	
+sys.exit( )
