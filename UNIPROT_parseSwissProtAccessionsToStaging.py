@@ -11,11 +11,12 @@ from classes import UniprotAccessionXMLParser
 from xml.sax import parse
 from gzip import open as gopen
 
-db = Database.db
-cursor = db.cursor( )
+with Database.db as cursor :
 
-cursor.execute( "TRUNCATE TABLE " + Config.DB_STAGING + ".swissprot_ids" )
-db.commit( )
+	cursor.execute( "TRUNCATE TABLE " + Config.DB_STAGING + ".swissprot_ids" )
+	Database.db.commit( )
 
-with gopen( Config.UP_SWISSPROT ) as swissprot :
-	parse( swissprot, UniprotAccessionXMLParser.UniprotAccessionXMLParser( ) )
+	with gopen( Config.UP_SWISSPROT ) as swissprot :
+		parse( swissprot, UniprotAccessionXMLParser.UniprotAccessionXMLParser( ) )
+	
+sys.exit( )

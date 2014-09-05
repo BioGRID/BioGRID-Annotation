@@ -18,6 +18,11 @@ To use all of the tools contained within, you require at least the following:
 + json
 + xml.sax
 
+### Required Databases (from SQL directory if starting fresh)
++ core_staging - Tables used for staging data before updating.
++ core_stats - Tables for storing statistics on update progress.
++ core - Tables storing the complete annotation dataset.
+
 ## Update Process
 
 ### Before Getting Started 
@@ -34,4 +39,10 @@ Make sure you have a loaded copy of the annotation database tables to use for th
 + Run: **python EG_parseGeneHistoryToStaging.py** - This will load the gene history from ENTREZ GENE into a staging table for later use.
 
 + Run: **python UNIPROT_parseSwissProtAccessionsToStaging.py** - This will load all the SWISSPROT accession ids into a staging table so we can later quickly determine which ids are from SWISSPROT and which are from TREMBL.
+
+#### Process ENTREZ GENE
+
++ Run: **python GENES_updateGeneHistory.py** - This will use _entrez_gene_history_ in the staging database to swap identifiers if they were replaced with an alternative. Also, it will discontinue genes that were merged, so there are no redundancies.
+
++ Run: **python EG_parseGenes.py** - This will load up all new genes into the genes table using only the organisms in the _organisms_ table.
 
