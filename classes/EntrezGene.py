@@ -80,3 +80,9 @@ class EntrezGene( ) :
 			else :
 				# otherwise, update record to new entrez gene id
 				self.updateGene( geneID, entrezGeneID, replacementID )
+				
+	def __del__( self ) :
+		if self.cursor is not None :
+			self.cursor.close( )
+		if self.db is not None :
+			self.db.close( )

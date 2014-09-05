@@ -24,3 +24,6 @@ for row in cursor.fetchall( ) :
 
 cursor.execute( "INSERT INTO " + Config.DB_STATS + ".update_tracker VALUES ( '0', 'Entrez-Gene History', NOW( ) )" )
 db.commit( )
+
+cursor.close( )
+db.close( )

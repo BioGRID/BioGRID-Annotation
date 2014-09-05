@@ -19,3 +19,6 @@ db.commit( )
 
 with gopen( Config.UP_SWISSPROT ) as swissprot :
 	parse( swissprot, UniprotAccessionXMLParser.UniprotAccessionXMLParser( ) )
+	
+cursor.close( )
+db.close( )

@@ -26,3 +26,9 @@ class CommonFunctions( ) :
 			organismInfo[organism_id] = row
 
 		return organismInfo
+		
+	def __del__( self ) :
+		if self.cursor is not None :
+			self.cursor.close( )
+		if self.db is not None :
+			self.db.close( )

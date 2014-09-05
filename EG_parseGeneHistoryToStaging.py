@@ -43,5 +43,6 @@ for line in historyFile.readlines( ) :
 		db.commit( )
 		
 db.commit( )
+cursor.close( )
 db.close( )
 historyFile.close( )
