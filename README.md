@@ -35,3 +35,7 @@ Make sure you have a loaded copy of the annotation database tables to use for th
 
 + Run: **python UNIPROT_parseSwissProtAccessionsToStaging.py** - This will load all the SWISSPROT accession ids into a staging table so we can later quickly determine which ids are from SWISSPROT and which are from TREMBL.
 
+#### Process ENTREZ GENE
+
++ Run: **python GENES_updateGeneHistory.py - This will use the entrez_gene_history in the staging database to swap identifiers if they were replaced with an alternative. Also, it will discontinue genes that were merged, so there are no redundancies.
+
