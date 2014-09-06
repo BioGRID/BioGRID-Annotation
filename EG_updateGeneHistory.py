@@ -21,7 +21,7 @@ with Database.db as cursor :
 	for row in cursor.fetchall( ) :
 		entrezGene.processGeneHistory( row[0], row[1] )
 
-	cursor.execute( "INSERT INTO " + Config.DB_STATS + ".update_tracker VALUES ( '0', 'Entrez-Gene History', NOW( ) )" )
+	cursor.execute( "INSERT INTO " + Config.DB_STATS + ".update_tracker VALUES ( '0', 'EG_updateGeneHistory', NOW( ) )" )
 	Database.db.commit( )
 	
 sys.exit( )

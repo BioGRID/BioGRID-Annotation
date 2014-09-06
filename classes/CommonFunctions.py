@@ -25,3 +25,24 @@ class CommonFunctions( ) :
 			organismInfo[organism_id] = row
 
 		return organismInfo
+		
+	def fetchEntrezGeneOrganismMapping( self ) :
+	
+		self.cursor.execute( "SELECT organism_id, organism_entrez_taxid FROM " + Config.DB_NAME + ".organisms WHERE organism_status='active'" )
+		
+		organismList = {}
+		for row in self.cursor.fetchall( ) :
+			(organismID, organismEntrezID) = row
+			organismList[organismEntrezID] = organismID
+			
+		return organismList
+		
+	def fetchExistingEntrezGeneIDs( self ) :
+		
+		self.cursor.execute( "SELECT gene_id, gene_source_id FROM " + Config.DB_NAME + ".genes WHERE gene_status='active'" )
+		
+		idList = { }
+		for row in self.cursor.fetchall( ) :
+			idList[row[1]] = row[0]
+			
+		return idList
