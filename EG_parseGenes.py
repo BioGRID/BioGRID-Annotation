@@ -9,13 +9,13 @@ import MySQLdb
 import Database
 import gzip
 
-from classes import EntrezGene, CommonFunctions
+from classes import EntrezGene
 
 with Database.db as cursor :
 
-	common = CommonFunctions.CommonFunctions( Database.db, cursor )
-	organismList = common.fetchEntrezGeneOrganismMapping( )
-	existingEntrezGeneIDs = common.fetchExistingEntrezGeneIDs( )
+	entrezGene = EntrezGene.EntrezGene( Database.db, cursor )
+	organismList = entrezGene.fetchEntrezGeneOrganismMapping( )
+	existingEntrezGeneIDs = entrezGene.fetchExistingEntrezGeneIDs( )
 
 	missingOrgs = set( )
 	

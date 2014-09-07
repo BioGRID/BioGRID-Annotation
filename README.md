@@ -44,5 +44,10 @@ Make sure you have a loaded copy of the annotation database tables to use for th
 
 + Run: **python GENES_updateGeneHistory.py** - This will use _entrez_gene_history_ in the staging database to swap identifiers if they were replaced with an alternative. Also, it will discontinue genes that were merged, so there are no redundancies.
 
-+ Run: **python EG_parseGenes.py** - This will load up all new genes into the genes table using only the organisms in the _organisms_ table.
++ Run: **python EG_parseGenes.py** - This will load up all new genes from ENTREZ GENE into the genes table using only the organisms in the _organisms_ table.
 
++ Run: **python EG_parseAliases.py** - This will load all the aliases from ENTREZ GENE fetching only those we are interested in via previously loaded data stored in the _genes_ table.
+
++ Run: **python EG_parseExternals.py** - This will load all the external database references from ENTREZ GENE fetching only those we are interested in via previously loaded data stored in the _genes_ table.
+
+#### Process GENE ONTOLOGY
