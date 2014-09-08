@@ -17,6 +17,7 @@ To use all of the tools contained within, you require at least the following:
 + gzip
 + json
 + xml.sax
++ xml.etree
 
 ### Required Databases (from SQL directory if starting fresh)
 + core_staging - Tables used for staging data before updating.
