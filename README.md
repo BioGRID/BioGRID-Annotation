@@ -41,6 +41,14 @@ Make sure you have a loaded copy of the annotation database tables to use for th
 
 + Run: **python UNIPROT_parseSwissProtAccessionsToStaging.py** - This will load all the SWISSPROT accession ids into a staging table so we can later quickly determine which ids are from SWISSPROT and which are from TREMBL.
 
+#### Process GENE ONTOLOGY
+
++ Run: **python GO_parseDefinitions.py** - This will load all the terms and definitions from GO and create a mapping to their GO SLIM subsets.
+
++ Run: **python GO_parseRelationships.py** - This will load all the is_a relationships between terms from GO.
+
++ Run: **python GO_buildSubsetPairings.py** - This will build parent child relationship pairings between GO terms and their parent terms based on GO SLIM subsets.
+
 #### Process ENTREZ GENE
 
 + Run: **python EG_updateGeneHistory.py** - This will use _entrez_gene_history_ in the staging database to swap identifiers if they were replaced with an alternative. Also, it will discontinue genes that were merged, so there are no redundancies.
@@ -53,4 +61,3 @@ Make sure you have a loaded copy of the annotation database tables to use for th
 
 + Run: **python EG_parseDefinitions.py** - This will load all the definition entries from ENTREZ GENE fetching only those we are interested in via previously loaded data stored in the _genes_ table.
 
-#### Process GENE ONTOLOGY
