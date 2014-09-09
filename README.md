@@ -61,3 +61,5 @@ Make sure you have a loaded copy of the annotation database tables to use for th
 
 + Run: **python EG_parseDefinitions.py** - This will load all the definition entries from ENTREZ GENE fetching only those we are interested in via previously loaded data stored in the _genes_ table.
 
++ Run: **python EG_parseGO.py** - This will load the ENTREZ GENE gene2go file for a mapping of GENE ONTOLOGY terms to _genes_.
+
