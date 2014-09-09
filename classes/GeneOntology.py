@@ -13,6 +13,7 @@ class GeneOntology( ) :
 		self.ignoreTerms = [8150,3674,5575] # biological_process, molecular_function, cellular_component
 		self.mappingHash = self.buildSubsetMappingHash( )
 		self.parentHash = self.buildParentMappingHash( )
+		self.evidenceHash = self.buildEvidenceHash( )
 		
 	def getMappingHash( self ) :
 		return self.mappingHash
@@ -56,4 +57,28 @@ class GeneOntology( ) :
 			mappingHash[row[0]].append( row[1] )
 			
 		return mappingHash
+		
+	def buildEvidenceHash( self ) :
+		
+		self.cursor.execute( "SELECT go_evidence_code_id, go_evidence_code_symbol FROM " + Config.DB_NAME + ".go_evidence_codes" )
+		
+		mappingHash = {}
+		for row in self.cursor.fetchall( ) :
+			if not row[1] in mappingHash :
+				mappingHash[row[1].upper( )] = row[0]
+			
+		return mappingHash
+		
+	def fetchEvidenceIDFromEvidenceSymbol( self, symbol ) :
+
+		symbol = symbol.strip( ).upper( )
+	
+		if symbol not in self.evidenceHash :
+
+			self.cursor.execute( "INSERT INTO " + Config.DB_NAME + ".go_evidence_codes VALUES ( '0',%s,'',NOW( ),'active' )", [symbol] )
+			self.db.commit( )
+			
+			self.evidenceHash[symbol] = self.cursor.lastrowid
+		
+		return self.evidenceHash[symbol]
 				

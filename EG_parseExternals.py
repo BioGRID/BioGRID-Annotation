@@ -17,7 +17,9 @@ with Database.db as cursor :
 	existingEntrezGeneIDs = entrezGene.fetchExistingEntrezGeneIDs( )
 	
 	cursor.execute( "DELETE FROM " + Config.DB_NAME + ".gene_externals WHERE gene_external_source != 'GRID LEGACY'" )
+	Database.db.commit( )
 	cursor.execute( "OPTIMIZE TABLE " + Config.DB_NAME + ".gene_externals" )
+	Database.db.commit( )
 	
 	insertCount = 0
 	with gzip.open( Config.EG_GENEINFO, 'r' ) as file :
