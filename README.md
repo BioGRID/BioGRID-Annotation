@@ -17,6 +17,7 @@ To use all of the tools contained within, you require at least the following:
 + gzip
 + json
 + xml.sax
++ xml.etree
 
 ### Required Databases (from SQL directory if starting fresh)
 + core_staging - Tables used for staging data before updating.
@@ -26,7 +27,7 @@ To use all of the tools contained within, you require at least the following:
 ## Update Process
 
 ### Before Getting Started 
-Make sure you have a loaded copy of the annotation database tables to use for the new annotation. Load a MySQL dump of the existing BioGRID CORE tables (in the SQL folder), and load it into a fresh database if starting new. Otherwise, point to a previous version of the database. Once the database is loaded, make sure you add any organisms you want added, or changed, to the organisms table, as that table will be used to fetch your set of annotation.
+Make sure you have a loaded copy of the annotation database tables to use for the new annotation. Load a MySQL dump of the existing CORE tables (in the SQL folder), and load it into a fresh database if starting new. Otherwise, point to a previous version of the database. Once the database is loaded, make sure you add any organisms you want added, or changed, to the organisms table, as that table will be used to fetch your set of annotation.
 
 + Run the batch/fetchDownloads.sh file to download all the required files for an annotation update. This process will take some time, depending on the speed of your network connection. For example: the Trembl file from Uniprot is currently larger than 55 GB in XML format.
 
@@ -40,9 +41,17 @@ Make sure you have a loaded copy of the annotation database tables to use for th
 
 + Run: **python UNIPROT_parseSwissProtAccessionsToStaging.py** - This will load all the SWISSPROT accession ids into a staging table so we can later quickly determine which ids are from SWISSPROT and which are from TREMBL.
 
+#### Process GENE ONTOLOGY
+
++ Run: **python GO_parseDefinitions.py** - This will load all the terms and definitions from GO and create a mapping to their GO SLIM subsets.
+
++ Run: **python GO_parseRelationships.py** - This will load all the is_a relationships between terms from GO.
+
++ Run: **python GO_buildSubsetPairings.py** - This will build parent child relationship pairings between GO terms and their parent terms based on GO SLIM subsets.
+
 #### Process ENTREZ GENE
 
-+ Run: **python GENES_updateGeneHistory.py** - This will use _entrez_gene_history_ in the staging database to swap identifiers if they were replaced with an alternative. Also, it will discontinue genes that were merged, so there are no redundancies.
++ Run: **python EG_updateGeneHistory.py** - This will use _entrez_gene_history_ in the staging database to swap identifiers if they were replaced with an alternative. Also, it will discontinue genes that were merged, so there are no redundancies.
 
 + Run: **python EG_parseGenes.py** - This will load up all new genes from ENTREZ GENE into the genes table using only the organisms in the _organisms_ table.
 
@@ -50,4 +59,5 @@ Make sure you have a loaded copy of the annotation database tables to use for th
 
 + Run: **python EG_parseExternals.py** - This will load all the external database references from ENTREZ GENE fetching only those we are interested in via previously loaded data stored in the _genes_ table.
 
-#### Process GENE ONTOLOGY
++ Run: **python EG_parseDefinitions.py** - This will load all the definition entries from ENTREZ GENE fetching only those we are interested in via previously loaded data stored in the _genes_ table.
+
