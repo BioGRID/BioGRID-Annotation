@@ -41,6 +41,8 @@ Make sure you have a loaded copy of the annotation database tables to use for th
 
 + Run: **python UNIPROT_parseSwissProtAccessionsToStaging.py** - This will load all the SWISSPROT accession ids into a staging table so we can later quickly determine which ids are from SWISSPROT and which are from TREMBL.
 
++ Run: **python REFSEQ_fetchProteinIDs.py** - This will load all the protein UIDs for REFSEQ into a staging table based on the organisms we are interested in.
+
 #### Process GENE ONTOLOGY
 
 + Run: **python GO_parseDefinitions.py** - This will load all the terms and definitions from GO and create a mapping to their GO SLIM subsets.

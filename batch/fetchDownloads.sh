@@ -31,11 +31,3 @@ wget -m -nd ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledg
 
 cd ../pombase
 wget -m -nd ftp://ftp.ebi.ac.uk/pub/databases/pombase/pombe/Mappings/sysID2product.tsv
-
-cd ../refseq/protein
-rm -f *.faa
-wget -m -nd ftp://ftp.ncbi.nih.gov/refseq/release/complete/*.protein.faa.gz
-
-cd ../rna
-rm -f *.fna
-wget -m -nd ftp://ftp.ncbi.nih.gov/refseq/release/complete/*.rna.fna.gz
