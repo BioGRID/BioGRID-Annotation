@@ -67,6 +67,7 @@ with Database.db as cursor :
 				cursor.execute( "UPDATE " + Config.DB_NAME + ".refseq SET refseq_gi=%s, refseq_sequence=%s, refseq_length=%s, refseq_description=%s, refseq_version=%s, refseq_modified=NOW( ), refseq_status='active', organism_id=%s WHERE refseq_id=%s", [sequenceInfo['GI'], sequence, sequenceLength, sequenceInfo["DESC"], sequenceInfo["VERSION"], taxID, accessionHash[accession]] )
 			else :
 				cursor.execute( "INSERT INTO " + Config.DB_NAME + ".refseq VALUES( '0', %s, %s, %s, %s, %s, %s, %s, NOW( ), 'active' )", [accession, sequenceInfo["GI"], sequence, sequenceLength, sequenceInfo["DESC"], sequenceInfo["VERSION"], taxID] )
+				accessionHash[accession] = cursor.lastrowid
 			
 		Database.db.commit( )
 	

@@ -34,7 +34,7 @@ Make sure you have a loaded copy of the annotation database tables to use for th
 
 + Verify that all files are downloaded
 
-+  Go to config/config.json (or create this file modelled on the config.json.example file already in this directory) and adjust the settings in here to point to your setup. Especially modify the paths and the database login credentials to match your current configuration.
++ Go to config/config.json (or create this file modelled on the config.json.example file already in this directory) and adjust the settings in here to point to your setup. Especially modify the paths and the database login credentials to match your current configuration.
 
 #### Prepare Staging Database
 
@@ -69,3 +69,7 @@ Make sure you have a loaded copy of the annotation database tables to use for th
 #### Process REFSEQ
 
 + Run: **python REFSEQ_downloadProteins.py** - This will download protein FASTA files for all the protein IDs downloaded into the staging database. This will take some time as sequences can only be fetched in batches of 10,000 at a time.
+
++ Run: **python REFSEQ_parseProteins.py** - This will parse the FASTA files downloaded in the step above and load them into the database. If the sequence already exists, its details are updated instead.
+
++ Run: **python EG_parseGene2Refseq.py** - This will parse the Gene2Refseq file from ENTREZ GENE and create a mapping table between ENTREZ GENE ids and REFSEQ proteins.

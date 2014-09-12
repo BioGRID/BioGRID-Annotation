@@ -1,5 +1,6 @@
 
-# Parse go mappings from ENTREZ GENE for genes
+# Download files from the eutils efetch service containing
+# proteins of interest in batches of 10,000
 
 import Config
 import sys, string
@@ -50,6 +51,8 @@ with Database.db as cursor :
 			response = urllib2.urlopen( request )
 			fetchData = response.read( )
 			
+			# Downloads the files only to minimize processing errors
+			# which may result in too many hits to the eutils website
 			with open( Config.PROTEIN_DIR + "refseq_proteins_" + str(startID) + "-" + str(endID) + ".fasta", 'w' ) as fastaFile :
 				fastaFile.write( fetchData )
 			
