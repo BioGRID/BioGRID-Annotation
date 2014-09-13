@@ -1,6 +1,7 @@
 
-# Download files from the eutils efetch service containing
-# proteins of interest in batches of 10,000
+# Connects to the EUTILS service to download
+# REFSEQ proteins that are not fully filled out
+# in the refseq table.
 
 import Config
 import sys, string
@@ -23,17 +24,17 @@ MAX_PER = 10000
 
 with Database.db as cursor :
 
-	cursor.execute( "SELECT refseq_protein_id, refseq_protein_uid FROM " + Config.DB_STAGING + ".refseq_protein_ids WHERE refseq_protein_downloaded='false'" )
+	cursor.execute( "SELECT refseq_id, refseq_accession FROM " + Config.DB_NAME + ".refseq WHERE refseq_sequence='' AND refseq_status='active'" )
 
-	uidList = []
+	accessionList = []
 	mappingHash = { }
 	for row in cursor.fetchall( ) :
-		uidList.append(str(row[1]))
+		accessionList.append(str(row[1]))
 		mappingHash[str(row[1])] = str(row[0])
 		
 	fileCounter = 1
 	start = 0
-	currentSet = uidList[start:MAX_PER]
+	currentSet = accessionList[start:MAX_PER]
 	
 	iteration = 1
 	while len(currentSet) > 0 :
@@ -53,18 +54,12 @@ with Database.db as cursor :
 			
 			# Downloads the files only to minimize processing errors
 			# which may result in too many hits to the eutils website
-			with open( Config.PROTEIN_DIR + "refseq_proteins_" + str(startID) + "-" + str(endID) + ".fasta", 'w' ) as fastaFile :
+			with open( Config.PROTEIN_MISSING_DIR + "refseq_proteins_" + str(startID) + "-" + str(endID) + ".fasta", 'w' ) as fastaFile :
 				fastaFile.write( fetchData )
-			
-			for uid in currentSet :
-				dbID = mappingHash[uid]
-				cursor.execute( "UPDATE " + Config.DB_STAGING + ".refseq_protein_ids SET refseq_protein_downloaded='true' WHERE refseq_protein_id=%s", [dbID] )
-			
-			Database.db.commit( )
-			
+									
 			start = start + MAX_PER
 			fileCounter = fileCounter + 1
-			currentSet = uidList[start:start+MAX_PER]
+			currentSet = accessionList[start:start+MAX_PER]
 			iteration = 1
 			
 			time.sleep( 5 )
@@ -83,7 +78,7 @@ with Database.db as cursor :
 				currentSet = uidList[start:start+MAX_PER]
 				iteration = 1
 				
-	cursor.execute( "INSERT INTO " + Config.DB_STATS + ".update_tracker VALUES ( '0', 'REFSEQ_downloadProteins', NOW( ) )" )
+	cursor.execute( "INSERT INTO " + Config.DB_STATS + ".update_tracker VALUES ( '0', 'REFSEQ_downloadMissingProteins', NOW( ) )" )
 	Database.db.commit( )
 	
 sys.exit( )

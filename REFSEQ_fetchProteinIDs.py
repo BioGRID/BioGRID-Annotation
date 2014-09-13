@@ -16,8 +16,8 @@ searchURL = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
 searchData = { }
 searchData["db"] = "protein"
 searchData["retmax"] = 1000000
-searchData["email"] = "starkfree@gmail.com"
-searchData["tool"] = "BioGRID Annotation Update"
+searchData["email"] = Config.APP_EMAIL
+searchData["tool"] = Config.APP_TOOL
 
 MAX_ITERATIONS = 10
 
