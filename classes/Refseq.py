@@ -30,3 +30,13 @@ class Refseq( ) :
 			mappingHash[str(row[0])] = str(row[1])
 			
 		return mappingHash
+		
+	def buildRefseqMappingHash( self ) :
+	
+		self.cursor.execute( "SELECT refseq_id, refseq_accession FROM " + Config.DB_NAME + ".refseq WHERE refseq_status='active'" )
+		
+		mappingHash = {}
+		for row in self.cursor.fetchall( ) :
+			mappingHash[str(row[1])] = str(row[0])
+			
+		return mappingHash

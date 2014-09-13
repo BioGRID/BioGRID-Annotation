@@ -36,7 +36,7 @@ Make sure you have a loaded copy of the annotation database tables to use for th
 
 + Go to config/config.json (or create this file modelled on the config.json.example file already in this directory) and adjust the settings in here to point to your setup. Especially modify the paths and the database login credentials to match your current configuration.
 
-#### Prepare Staging Database
+#### Prepare STAGING DATABASE
 
 + Run: **python EG_parseGeneHistoryToStaging.py** - This will load the gene history from ENTREZ GENE into a staging table for later use.
 
@@ -52,6 +52,12 @@ Make sure you have a loaded copy of the annotation database tables to use for th
 
 + Run: **python GO_buildSubsetPairings.py** - This will build parent child relationship pairings between GO terms and their parent terms based on GO SLIM subsets.
 
+#### Process REFSEQ
+
++ Run: **python REFSEQ_downloadProteins.py** - This will download protein FASTA files for all the protein IDs downloaded into the staging database. This will take some time as sequences can only be fetched in batches of 10,000 at a time.
+
++ Run: **python REFSEQ_parseProteins.py** - This will parse the FASTA files downloaded in the step above and load them into the database. If the sequence already exists, its details are updated instead.
+
 #### Process ENTREZ GENE
 
 + Run: **python EG_updateGeneHistory.py** - This will use _entrez_gene_history_ in the staging database to swap identifiers if they were replaced with an alternative. Also, it will discontinue genes that were merged, so there are no redundancies.
@@ -65,11 +71,11 @@ Make sure you have a loaded copy of the annotation database tables to use for th
 + Run: **python EG_parseDefinitions.py** - This will load all the definition entries from ENTREZ GENE fetching only those we are interested in via previously loaded data stored in the _genes_ table.
 
 + Run: **python EG_parseGO.py** - This will load the ENTREZ GENE gene2go file for a mapping of GENE ONTOLOGY terms to _genes_.
- 
-#### Process REFSEQ
 
-+ Run: **python REFSEQ_downloadProteins.py** - This will download protein FASTA files for all the protein IDs downloaded into the staging database. This will take some time as sequences can only be fetched in batches of 10,000 at a time.
++ Run: **python EG_parseGene2Refseq.py** - This will parse the Gene2Refseq file from ENTREZ GENE and create a mapping table between _genes_ and _refseq_.
 
-+ Run: **python REFSEQ_parseProteins.py** - This will parse the FASTA files downloaded in the step above and load them into the database. If the sequence already exists, its details are updated instead.
+#### Process REFSEQ MISSING
 
-+ Run: **python EG_parseGene2Refseq.py** - This will parse the Gene2Refseq file from ENTREZ GENE and create a mapping table between ENTREZ GENE ids and REFSEQ proteins.
++ Run: **python REFSEQ_downloadMissingProteins.py** - This will download protein FASTA files for any proteins in the _refseq_ table that do not have annotation. These are most likely proteins that were added when running the EG_parseGene2Refseq.py script.
+
++ Run: **python REFSEQ_parseMissingProteins.py** - This will parse the FASTA files downloaded in the step above and load them into the database.

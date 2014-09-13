@@ -6,6 +6,10 @@ with open( "config/config.json", "r" ) as configFile :
 
 data = json.loads( data )
 
+# APP VARS
+APP_EMAIL = data['APP']['EMAIL']
+APP_TOOL  = data['APP']['TOOL']
+
 # DATABASE VARS
 DB_HOST = data['DB']['DB_HOST']
 DB_USER = data['DB']['DB_USER']
@@ -57,3 +61,4 @@ POMBASE_FEATURES = POMBASE_DIR + data['FILES']['POMBASE_FEATURES']
 # REFSEQ FILES
 PROTEIN_DIR = REFSEQ_DIR + data['PATHS']['REFSEQ_PROTEIN_DIR'] + os.sep
 RNA_DIR = REFSEQ_DIR + data['PATHS']['REFSEQ_RNA_DIR'] + os.sep
+PROTEIN_MISSING_DIR = REFSEQ_DIR + data['PATHS']['REFSEQ_MISSING_PROTEIN_DIR'] + os.sep

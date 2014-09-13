@@ -11,16 +11,11 @@ import glob
 from classes import Refseq
 
 with Database.db as cursor :
-
-	cursor.execute( "UPDATE " + Config.DB_NAME + ".refseq SET refseq_status='inactive'" )
-	cursor.execute( "TRUNCATE TABLE " + Config.DB_NAME + ".refseq_identifiers" )
-	Database.db.commit( )
 	
 	refseq = Refseq.Refseq( Database.db, cursor )
 	accessionHash = refseq.buildAccessionMappingHash( )
-	organismHash = refseq.buildOrganismMappingHash( )
 	
-	for filename in glob.glob( Config.PROTEIN_DIR + "*.fasta" ) :
+	for filename in glob.glob( Config.PROTEIN_MISSING_DIR + "*.fasta" ) :
 	
 		print "Working on File: " + filename
 		
@@ -63,18 +58,13 @@ with Database.db as cursor :
 		
 			sequence = "".join( sequenceInfo["SEQUENCE"] )
 			sequenceLength = len( sequence )
-			
-			taxID = organismHash[sequenceInfo["GI"]]
 		
 			if accession in accessionHash :
-				cursor.execute( "UPDATE " + Config.DB_NAME + ".refseq SET refseq_gi=%s, refseq_sequence=%s, refseq_length=%s, refseq_description=%s, refseq_version=%s, refseq_modified=NOW( ), refseq_status='active', organism_id=%s WHERE refseq_id=%s", [sequenceInfo['GI'], sequence, sequenceLength, sequenceInfo["DESC"], sequenceInfo["VERSION"], taxID, accessionHash[accession]] )
-			else :
-				cursor.execute( "INSERT INTO " + Config.DB_NAME + ".refseq VALUES( '0', %s, %s, %s, %s, %s, %s, %s, NOW( ), 'active' )", [accession, sequenceInfo["GI"], sequence, sequenceLength, sequenceInfo["DESC"], sequenceInfo["VERSION"], taxID] )
-				accessionHash[accession] = cursor.lastrowid
+				cursor.execute( "UPDATE " + Config.DB_NAME + ".refseq SET refseq_gi=%s, refseq_sequence=%s, refseq_length=%s, refseq_description=%s, refseq_version=%s, refseq_modified=NOW( ), refseq_status='active' WHERE refseq_id=%s", [sequenceInfo['GI'], sequence, sequenceLength, sequenceInfo["DESC"], sequenceInfo["VERSION"], accessionHash[accession]] )
 			
 		Database.db.commit( )
 	
-	cursor.execute( "INSERT INTO " + Config.DB_STATS + ".update_tracker VALUES ( '0', 'REFSEQ_parseProteins', NOW( ) )" )
+	cursor.execute( "INSERT INTO " + Config.DB_STATS + ".update_tracker VALUES ( '0', 'REFSEQ_parseMissingProteins', NOW( ) )" )
 	Database.db.commit( )
 	
 sys.exit( )
