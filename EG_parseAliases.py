@@ -42,7 +42,7 @@ with Database.db as cursor :
 					insertCount = insertCount + 1
 					cursor.execute( "INSERT INTO " + Config.DB_NAME + ".gene_aliases VALUES ( '0', %s, 'active', 'entrez-official', NOW( ), %s )", [officialSymbol, currentGeneID] )
 					
-				if "-" != systematicName and systematicName.lower( ) != officialSymbol.lower( ) :
+				if "-" != systematicName :
 					insertCount = insertCount + 1
 					cursor.execute( "INSERT INTO " + Config.DB_NAME + ".gene_aliases VALUES ( '0', %s, 'active', 'ordered locus', NOW( ), %s )", [systematicName, currentGeneID] )
 					

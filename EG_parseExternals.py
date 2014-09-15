@@ -49,6 +49,9 @@ with Database.db as cursor :
 			if 0 == (insertCount % Config.DB_COMMIT_COUNT ) :
 				Database.db.commit( )
 				
+	cursor.execute( "INSERT INTO " + Config.DB_NAME + ".gene_externals SELECT '0', gene_source_id, 'SGD', 'active', NOW( ), gene_id FROM " + Config.DB_NAME + ".genes WHERE gene_source='SGD'" )
+	Database.db.commit( )
+		
 	cursor.execute( "INSERT INTO " + Config.DB_STATS + ".update_tracker VALUES ( '0', 'EG_parseExternals', NOW( ) )" )
 	Database.db.commit( )
 	

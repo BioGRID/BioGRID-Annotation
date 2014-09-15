@@ -79,3 +79,9 @@ Make sure you have a loaded copy of the annotation database tables to use for th
 + Run: **python REFSEQ_downloadMissingProteins.py** - This will download protein FASTA files for any proteins in the _refseq_ table that do not have annotation. These are most likely proteins that were added when running the EG_parseGene2Refseq.py script.
 
 + Run: **python REFSEQ_parseMissingProteins.py** - This will parse the FASTA files downloaded in the step above and load them into the database.
+
+#### Process MODEL ORGANISM SUPPLEMENTS
+
++ Run: **python SGD_parseGenes.py** - This will process the SGD Features file and match our _gene_ table with the current official symbol and descriptions for genes. It will also load in "retrotransposon" records which are required by BioGRID but not loaded via ENTREZ_GENE.
+
++ Run: **python POMBASE_parseGenes.py** - This will process the Pombase file and match our _gene_ table with the current official symbol and descriptions for genes. 
