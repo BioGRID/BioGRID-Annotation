@@ -85,3 +85,7 @@ Make sure you have a loaded copy of the annotation database tables to use for th
 + Run: **python SGD_parseGenes.py** - This will process the SGD Features file and match our _gene_ table with the current official symbol and descriptions for genes. It will also load in "retrotransposon" records which are required by BioGRID but not loaded via ENTREZ_GENE.
 
 + Run: **python POMBASE_parseGenes.py** - This will process the Pombase file and match our _gene_ table with the current official symbol and descriptions for genes. 
+
++ Run: **python CGD_fixAnnotation.py** - This will process the CGD file and fix some problems with the ENTREZ GENE version. Specifically, some duplicate entries and non-common place systematic names.
+
+#### Process UNIPROTKB

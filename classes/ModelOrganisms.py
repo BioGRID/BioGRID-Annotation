@@ -31,6 +31,18 @@ class ModelOrganisms( ) :
 			
 		return mappingHash
 		
+	def buildCGDAliasHash( self ) :
+		
+		self.cursor.execute( "SELECT gene_id, gene_alias_value FROM " + Config.DB_NAME + ".gene_aliases WHERE gene_id IN ( SELECT gene_id FROM " + Config.DB_NAME + ".genes WHERE organism_id='237561' )" )
+		
+		mappingHash = {}
+		for row in self.cursor.fetchall( ) :
+			if str(row[1]) not in mappingHash :
+				mappingHash[str(row[1])] = []
+			mappingHash[str(row[1])].append(str(row[0]))
+			
+		return mappingHash
+		
 	def processName( self, geneID, orfName, officialSymbol, officialType, aliases) :
 	
 		self.cursor.execute( "SELECT gene_name FROM " + Config.DB_NAME + ".genes WHERE gene_id=%s LIMIT 1", [geneID] )
@@ -87,4 +99,18 @@ class ModelOrganisms( ) :
 			self.cursor.execute( "INSERT INTO " + Config.DB_NAME + ".gene_definitions VALUES( '0', %s, %s, 'active', NOW( ), %s )", [definition, definitionType, geneID] )
 				
 		self.db.commit( )
-
+		
+	def processExternals( self, geneID, externals, externalSource ) :
+	
+		self.cursor.execute( "SELECT gene_external_value FROM " + Config.DB_NAME +  ".gene_externals WHERE gene_id=%s AND gene_external_source=%s AND gene_external_status='active'", [geneID, externalSource] )
+	
+		externalSet = set( )
+		for row in self.cursor.fetchall( ) :
+			externalSet.add( row[0].lower( ) )
+			
+		for external in externals :
+			external = external.strip( )
+			if "" != external and external.lower( ) not in externalSet :
+				self.cursor.execute( "INSERT INTO " + Config.DB_NAME + ".gene_externals VALUES( '0',%s,%s,'active',NOW( ),%s )", [external, externalSource.upper( ), geneID] )
+				
+		self.db.commit( )
