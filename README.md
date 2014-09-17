@@ -86,6 +86,6 @@ Make sure you have a loaded copy of the annotation database tables to use for th
 
 + Run: **python POMBASE_parseGenes.py** - This will process the Pombase file and match our _gene_ table with the current official symbol and descriptions for genes. 
 
-+ Run: **python CGD_fixAnnotation.py** - This will process the CGD file and fix some problems with the ENTREZ GENE version. Specifically, some duplicate entries and non-common place systematic names.
++ Run: **python CGD_fixAnnotation.py** - This will process the CGD file and fix some problems with the ENTREZ GENE version. Specifically, some duplicate entries and non-common place systematic names. This script will likely require modification due to regular changes to file formatting and processes at both CGD and NCBI.
 
 #### Process UNIPROTKB
