@@ -7,6 +7,7 @@
 		"REFSEQ_MISSING_PROTEIN_DIR"	: "missing_protein",
 		"REFSEQ_RNA_DIR"	 			: "rna",
 		"UNIPROT_DIR"	 				: "uniprot",
+		"UNIPROT_PROTEINS_DIR"			: "proteins",
 		"CGD_DIR"						: "cgd",
 		"SGD_DIR"						: "sgd",
 		"PSI_DIR"						: "psi",

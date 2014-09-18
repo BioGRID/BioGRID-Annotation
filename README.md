@@ -89,3 +89,5 @@ Make sure you have a loaded copy of the annotation database tables to use for th
 + Run: **python CGD_fixAnnotation.py** - This will process the CGD file and fix some problems with the ENTREZ GENE version. Specifically, some duplicate entries and non-common place systematic names. This script will likely require modification due to regular changes to file formatting and processes at both CGD and NCBI.
 
 #### Process UNIPROTKB
+
++ Run: **python UNIPROT_downloadProteins.py** - This will download a file for each organism we are interested in containing both SWISS-PROT and TREMBL proteins. These will be parsed out in the subsequent steps.
