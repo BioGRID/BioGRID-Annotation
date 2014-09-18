@@ -40,8 +40,6 @@ Make sure you have a loaded copy of the annotation database tables to use for th
 
 + Run: **python EG_parseGeneHistoryToStaging.py** - This will load the gene history from ENTREZ GENE into a staging table for later use.
 
-+ Run: **python UNIPROT_parseSwissProtAccessionsToStaging.py** - This will load all the SWISSPROT accession ids into a staging table so we can later quickly determine which ids are from SWISSPROT and which are from TREMBL.
-
 + Run: **python REFSEQ_fetchProteinIDs.py** - This will load all the protein UIDs for REFSEQ into a staging table based on the organisms we are interested in.
 
 #### Process GENE ONTOLOGY
@@ -91,3 +89,5 @@ Make sure you have a loaded copy of the annotation database tables to use for th
 #### Process UNIPROTKB
 
 + Run: **python UNIPROT_downloadProteins.py** - This will download a file for each organism we are interested in containing both SWISS-PROT and TREMBL proteins. These will be parsed out in the subsequent steps.
+
++ Run: **python UNIPROT_parseProteins.py** - This will process each of the files downloaded in the previous step and load their annotation information into appropriate tables.
