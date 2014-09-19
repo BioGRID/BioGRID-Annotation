@@ -15,6 +15,15 @@ class GeneOntology( ) :
 		self.parentHash = self.buildParentMappingHash( )
 		self.evidenceHash = self.buildEvidenceHash( )
 		
+	def buildGOIDHash( self ) :
+		self.cursor.execute( "SELECT go_id, go_full_id FROM " + Config.DB_NAME + ".go_definitions WHERE go_status='active'" )
+		
+		mappingHash = {}
+		for row in self.cursor.fetchall( ) :
+			mappingHash[row[1]] = row[0]
+			
+		return mappingHash
+		
 	def getMappingHash( self ) :
 		return self.mappingHash
 		
