@@ -150,13 +150,7 @@ class UniprotProteinXMLParser( handler.ContentHandler ) :
 			self.uniprotKB.processAliases( uniprotID, self.currentRecord )
 			self.uniprotKB.processExternals( uniprotID, self.currentRecord )
 			self.uniprotKB.processDefinitions( uniprotID, self.currentRecord )
-			# geneIDs = self.processGenes( )
-			# proteinID = self.processProtein( )
-			# self.processGeneMapping( geneIDs, proteinID )
-			# self.processGO( proteinID )
-			# self.processFeatures( proteinID )
-			# self.processExternals( proteinID )
-			# self.processAliases( proteinID )
+			self.uniprotKB.processGO( uniprotID, self.currentRecord )
 		
 			self.currentRecord = { }
 		

@@ -5,11 +5,16 @@ import MySQLdb
 import sys, string
 import Config
 
+from classes import GeneOntology
+
 class UniprotKB( ) :
 
 	def __init__( self, db, cursor ) :
 		self.db = db
 		self.cursor = cursor
+		self.geneOntology = GeneOntology.GeneOntology( db, cursor )
+		self.goIDHash = self.geneOntology.buildGOIDHash( )
+		self.goEvidenceHash = self.geneOntology.buildEvidenceHash( )
 		
 	def processProtein( self, uniprotEntry, organismID ) :
 		
@@ -84,6 +89,18 @@ class UniprotKB( ) :
 			for description in uniprotEntry['descriptions'] :
 				self.cursor.execute( "INSERT INTO " + Config.DB_NAME + ".uniprot_definitions VALUES( '0', %s, %s, 'active', NOW( ), %s )", [description["DESC"], description["TYPE"].upper( ), uniprotID] )
 				
+		self.db.commit( )
+		
+	def processGO( self, uniprotID, uniprotEntry ) :
+	
+		if 'go' in uniprotEntry :
+			
+			for goMapping in uniprotEntry['go'] :
+				if goMapping['full_id'] in self.goIDHash and 'evidence' in goMapping :
+					goID = self.goIDHash[goMapping['full_id']]
+					if goMapping['evidence'].upper( ) in self.goEvidenceHash :
+						self.cursor.execute( "INSERT INTO " + Config.DB_NAME + ".uniprot_go VALUES( '0', %s, %s, 'active', NOW( ), %s )", [goID, self.goEvidenceHash[goMapping['evidence'].upper( )], uniprotID] )
+
 		self.db.commit( )
 			
 	def processFeatures( self, uniprotID, uniprotEntry ) :
