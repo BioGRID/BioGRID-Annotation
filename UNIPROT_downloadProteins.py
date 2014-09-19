@@ -3,11 +3,17 @@
 # proteins from organisms of interest
 
 import Config
-import sys, string
+import sys, string, argparse
 import MySQLdb
 import Database
 import urllib, urllib2
 import time
+
+# Process input in case we want to download a specific organism
+argParser = argparse.ArgumentParser( description = "Download Protein Files Grouped by Organism from Uniprot" )
+argGroup = argParser.add_mutually_exclusive_group( )
+argGroup.add_argument( '-o', dest='organism', type = int, nargs = 1, help = "An organism id for a specific file to download" )
+inputArgs = vars( argParser.parse_args( ) )
 
 searchURL = "http://www.uniprot.org/uniprot/"
 
@@ -24,7 +30,12 @@ with Database.db as cursor :
 	organismList = []
 	organismHash = { }
 	for row in cursor.fetchall( ) :
-		organismList.append( str(row[1]) )
+	
+		if inputArgs['organism'] is None :
+			organismList.append( str(row[1]) )
+		elif str(inputArgs['organism'][0]) == str(row[0]) :
+			organismList.append( str(row[1]) )
+			
 		organismHash[str(row[1])] = row
 	
 	fileCounter = 1
