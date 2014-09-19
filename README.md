@@ -88,6 +88,6 @@ Make sure you have a loaded copy of the annotation database tables to use for th
 
 #### Process UNIPROTKB
 
-+ Run: **python UNIPROT_downloadProteins.py** - This will download a file for each organism we are interested in containing both SWISS-PROT and TREMBL proteins. These will be parsed out in the subsequent steps.
++ Run: **python UNIPROT_downloadProteins.py** - This will download a file for each organism we are interested in containing both SWISS-PROT and TREMBL proteins. These will be parsed out in the subsequent steps. After completion, go to the directory where you downloaded the files and run **gzip --test --verbose *.gz**. This will test all the files to ensure they are complete (some may fail during transfer). If any show errors, simply run **python UNIPROT_downloadProteins.py -o <ORGANISM ID>** to re-download that specific file. Keep testing and re-downloading until all files pass as valid compressed files.
 
 + Run: **python UNIPROT_parseProteins.py** - This will process each of the files downloaded in the previous step and load their annotation information into appropriate tables.
