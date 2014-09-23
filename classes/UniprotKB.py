@@ -16,6 +16,38 @@ class UniprotKB( ) :
 		self.goIDHash = self.geneOntology.buildGOIDHash( )
 		self.goEvidenceHash = self.geneOntology.buildEvidenceHash( )
 		
+	def buildAccessionHash( self ) :
+	
+		self.cursor.execute( "SELECT uniprot_alias_value, uniprot_id FROM " + Config.DB_NAME + ".uniprot_aliases WHERE uniprot_alias_status='active' AND (uniprot_alias_type = 'primary-accession' OR uniprot_alias_type = 'accession') GROUP BY uniprot_alias_value" )
+		
+		accessionHash = { }
+		for row in self.cursor.fetchall( ) :
+			accessionHash[str(row[0])] = str(row[1])
+			
+		return accessionHash
+		
+	def buildOrganismHash( self ) :
+	
+		self.cursor.execute( "SELECT uniprot_id, organism_id FROM " + Config.DB_NAME + ".uniprot" )
+		
+		organismHash = { }
+		for row in self.cursor.fetchall( ) :
+			organismHash[str(row[0])] = str(row[1])
+			
+		return organismHash
+		
+	def processIsoform( self, uniprotID, organismID, isoEntry ) :
+	
+		geneVal = isoEntry["GENE"]
+		if "" == geneVal :
+			geneVal = "-"
+			
+		sequence = ("".join( isoEntry['SEQUENCE'] )).upper( )
+		sequenceLength = str(len(sequence))
+			
+		self.cursor.execute( "INSERT INTO " + Config.DB_NAME + ".uniprot_isoforms VALUES( '0',%s,%s,%s,%s,%s,%s,'active',NOW( ),%s,%s )", [isoEntry["ACCESSION"], isoEntry["ISOFORM"], sequence, sequenceLength, isoEntry["NAME"], isoEntry["DESC"], organismID, uniprotID] )
+		self.db.commit( )
+		
 	def processProtein( self, uniprotEntry, organismID ) :
 		
 		self.cursor.execute( "SELECT uniprot_id FROM " + Config.DB_NAME + ".uniprot WHERE uniprot_identifier_value=%s LIMIT 1", [uniprotEntry['primary_accession']] )
@@ -35,7 +67,7 @@ class UniprotKB( ) :
 		
 		row = self.cursor.fetchone( )
 		if None == row :
-			self.cursor.execute( "INSERT INTO " + Config.DB_NAME + ".uniprot VALUES ( '0',%s,'1',%s,%s,%s,%s,%s,%s,%s,'active',NOW( ),%s )", [uniprotEntry['primary_accession'], uniprotEntry['sequence'], uniprotEntry['sequence_length'], uniprotEntry['name'], descriptionVal, uniprotEntry['dataset'].upper( ), uniprotEntry['sequence_version'], uniprotEntry['existence'], organismID] )
+			self.cursor.execute( "INSERT INTO " + Config.DB_NAME + ".uniprot VALUES ( '0',%s,%s,%s,%s,%s,%s,%s,%s,'active',NOW( ),%s )", [uniprotEntry['primary_accession'], uniprotEntry['sequence'], uniprotEntry['sequence_length'], uniprotEntry['name'], descriptionVal, uniprotEntry['dataset'].upper( ), uniprotEntry['sequence_version'], uniprotEntry['existence'], organismID] )
 			return self.cursor.lastrowid
 		else :
 			self.cursor.execute( "UPDATE " + Config.DB_NAME + ".uniprot SET uniprot_sequence=%s, uniprot_sequence_length=%s, uniprot_name=%s, uniprot_description=%s, uniprot_source=%s, uniprot_version=%s, uniprot_curation_status=%s, uniprot_status='active' WHERE uniprot_id=%s", [uniprotEntry['sequence'], uniprotEntry["sequence_length"], uniprotEntry['name'], descriptionVal, uniprotEntry['dataset'].upper( ), uniprotEntry['sequence_version'], uniprotEntry['existence'], row[0]] )
