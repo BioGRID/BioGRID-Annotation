@@ -98,3 +98,16 @@ Make sure you have a loaded copy of the annotation database tables to use for th
 #### Process PROTEIN MAPPING
 
 + Run: **python EG_parseGene2Uniprot.py** - This will load the mapping data from the Gene2Uniprot Collab file, into a protein mapping table.
+
+### Quick Lookup Table Generation
+Once the annotation database is completed via the steps list above, we generate several quick lookup tables that facilitate rapid searching without requiring large joins or complicated SQL queries. These tables may take some time to complete, so be prepared for a lengthy process depending on your resources available.
+
++ Create a database containing a empty set of the quick_annotation tables. A reference SQL file can be found in the SQL folder.
+
++ Go to config/config.json and be sure to set the "DB_QUICK" entry to point to this new database.
+
+#### Build Quick Gene Annotation
+
++ Run: **python QUICK_buildQuickOrganisms.py** - This will create the quick organism lookup table.
+
++ Run: **python QUICK_buildQuickAnnotation.py** - This will generate a quick lookup table of gene annotation. The table containing this data is simply named _quick_annotation_ due to legacy purposes.
