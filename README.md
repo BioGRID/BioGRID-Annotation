@@ -94,3 +94,7 @@ Make sure you have a loaded copy of the annotation database tables to use for th
 + Run: **python UNIPROT_parseProteins.py** - This will process each of the files downloaded in the previous step and load their annotation information into appropriate tables.
 
 + Run: **python UNIPROT_parseIsoforms.py** - This will read the uniprot isoform datafile and load the isoforms into a separate table.
+
+#### Process PROTEIN MAPPING
+
++ Run: **python EG_parseGene2Uniprot.py** - This will load the mapping data from the Gene2Uniprot Collab file, into a protein mapping table.
