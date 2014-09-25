@@ -71,6 +71,8 @@ Make sure you have a loaded copy of the annotation database tables to use for th
 
 + Run: **python EG_parseGO.py** - This will load the ENTREZ GENE gene2go file for a mapping of GENE ONTOLOGY terms to _genes_.
 
++ Run: **python EG_parseGene2Ensembl.py** - This will load the ENTREZ GENE gene2ensembl file into the _gene_externals_ table for Ensembl entries.
+
 + Run: **python EG_parseGene2Refseq.py** - This will parse the Gene2Refseq file from ENTREZ GENE and create a mapping table between _genes_ and _refseq_.
 
 #### Process REFSEQ MISSING
