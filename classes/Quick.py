@@ -250,7 +250,7 @@ class Quick( ) :
 			if 'ENTREZ-DESCRIPTION' in descriptions :
 				description = "; ".join(descriptions['ENTREZ-DESCRIPTION'])
 						
-			elif 'PROTEIN-DESCRIPTION' in definitions :
+			elif 'PROTEIN-DESCRIPTION' in descriptions :
 				
 				longestDesc = "-"
 				for description in descriptions['PROTEIN-DESCRIPTION'] :
@@ -259,10 +259,10 @@ class Quick( ) :
 						
 				description = longestDesc
 				
-			elif 'ENTREZ-OTHERDESIGNATION' in defintions :
+			elif 'ENTREZ-OTHERDESIGNATION' in descriptions :
 				description = "; ".join(descriptions['ENTREZ-OTHERDESIGNATION'])
 						
-			elif 'ENTREZ-NOMENNAME' in defintions :
+			elif 'ENTREZ-NOMENNAME' in descriptions :
 				description = "; ".join(descriptions['ENTREZ-NOMENNAME'])
 				
 				
