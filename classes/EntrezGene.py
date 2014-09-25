@@ -12,6 +12,16 @@ class EntrezGene( ) :
 		self.db = db
 		self.cursor = cursor
 		
+	def fetchEnsemblHash( self ) :
+
+		self.cursor.execute( "SELECT gene_external_value, gene_id FROM " + Config.DB_NAME + ".gene_externals WHERE gene_external_source='ENSEMBL'" )
+		
+		ensemblHash = { }
+		for row in self.cursor.fetchall( ) :
+			ensemblHash[str(row[0]).upper( )] = str(row[1])
+			
+		return ensemblHash
+	
 	def fetchLastUpdateDate( self ) :
 
 		self.cursor.execute( "SELECT update_tracker_processed_date FROM " + Config.DB_STATS + ".update_tracker WHERE update_tracker_name='Entrez-Gene History' ORDER BY update_tracker_id DESC LIMIT 1" )
