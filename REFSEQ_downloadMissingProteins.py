@@ -8,7 +8,7 @@ import sys, string
 import MySQLdb
 import Database
 import urllib, urllib2
-import time
+import time, traceback
 
 searchURL = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
 
@@ -20,7 +20,7 @@ searchData["email"] = Config.APP_EMAIL
 searchData["tool"] = Config.APP_TOOL
 
 MAX_ITERATIONS = 10
-MAX_PER = 10000
+MAX_PER = 5000
 
 with Database.db as cursor :
 
@@ -65,6 +65,8 @@ with Database.db as cursor :
 			time.sleep( 5 )
 			
 		except Exception as e :
+		
+			print traceback.format_exc( )
 					
 			if iteration <= MAX_ITERATIONS :
 				print "FAILED ITERATION " + str(iteration)
