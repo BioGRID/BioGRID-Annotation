@@ -79,9 +79,8 @@ with Database.db as cursor :
 							if "-" != rnaGI :
 								cursor.execute( "INSERT INTO " + Config.DB_NAME + ".refseq_identifiers VALUES ( '0', %s, %s, '0', 'active', NOW( ), %s )", [rnaGI, 'rna-gi', refseqID] )
 					
-						else :
-							
-							missingRefseqs.add( str(proteinAccession) + "|" + str(currentGeneID) + "|" + str(entrezGeneTaxID) + "|" + status )
+					else :
+						missingRefseqs.add( str(proteinAccession) + "|" + str(currentGeneID) + "|" + str(entrezGeneTaxID) + "|" + status )
 			
 			if 0 == (insertCount % Config.DB_COMMIT_COUNT ) :
 				Database.db.commit( )
