@@ -93,6 +93,9 @@ with Database.db as cursor :
 		(orgID, orgEntrezID, orgUniprotID, orgName, orgOfficial, orgAbbr, orgStrain) = orgHash[str(row[5])]
 		geneRecord.extend( [str(orgID), orgName, orgOfficial, orgAbbr, orgStrain] )
 		
+		# Protein IDs - Empty for Now, Filled in Later
+		geneRecord.append( "-" )
+		
 		# Interaction Count
 		geneRecord.append( "0" )
 		
