@@ -40,3 +40,19 @@ class Refseq( ) :
 			mappingHash[str(row[1])] = str(row[0])
 			
 		return mappingHash
+		
+	def buildFullRefseqMappingHash( self ) :
+	
+		self.cursor.execute( "SELECT refseq_id, refseq_accession FROM " + Config.DB_NAME + ".refseq" )
+		
+		mappingHash = {}
+		for row in self.cursor.fetchall( ) :
+			mappingHash[str(row[1])] = str(row[0])
+			
+		self.cursor.execute( "SELECT refseq_id, refseq_identifier_value FROM " + Config.DB_NAME + ".refseq_identifiers WHERE refseq_identifier_type='rna-accession'" )
+		
+		for row in self.cursor.fetchall( ) :
+			if str(row[1]) not in mappingHash :
+				mappingHash[str(row[1])] = str(row[0])
+			
+		return mappingHash

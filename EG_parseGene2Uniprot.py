@@ -18,7 +18,7 @@ with Database.db as cursor :
 	uniprotKB = UniprotKB.UniprotKB( Database.db, cursor )
 	refseq = Refseq.Refseq( Database.db, cursor )
 	
-	refseqHash = refseq.buildAccessionMappingHash( )
+	refseqHash = refseq.buildFullRefseqMappingHash( )
 	uniprotHash = uniprotKB.buildAccessionHash( )
 	
 	mapping = set( )
@@ -41,8 +41,9 @@ with Database.db as cursor :
 				refseqID = refseqHash[refseqAcc]
 				uniprotID = uniprotHash[uniprotAcc]
 				
-				cursor.execute( "INSERT INTO " + Config.DB_NAME + ".protein_mapping VALUES( '0', %s, %s, 'active', NOW( ) )", [refseqID, uniprotID] )
-				mapping.add( refseqID + "|" + uniprotID )
+				if refseqID + "|" + uniprotID not in mapping : 
+					cursor.execute( "INSERT INTO " + Config.DB_NAME + ".protein_mapping VALUES( '0', %s, %s, 'active', NOW( ) )", [refseqID, uniprotID] )
+					mapping.add( refseqID + "|" + uniprotID )
 				
 				insertCount = insertCount + 1
 				
