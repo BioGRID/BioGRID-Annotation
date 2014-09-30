@@ -62,14 +62,18 @@ class Quick( ) :
 			
 		return goSet, goCombined
 		
-	def fetchGO( self, geneID ) :
+	def fetchGO( self, itemID, itemType ) :
 	
 		goProcess = { "IDS" : [], "NAMES" : [], "EVIDENCE" : [] }
 		goComponent = { "IDS" : [], "NAMES" : [], "EVIDENCE" : [] }
 		goFunction = { "IDS" : [], "NAMES" : [], "EVIDENCE" : [] }
 		
-		if len(geneID) > 0 :
-			self.cursor.execute( "SELECT go_id, go_evidence_code_id FROM " + Config.DB_NAME + ".gene_go WHERE gene_id=%s AND gene_go_status='active'", [geneID] )
+		if len(itemID) > 0 :
+			
+			if "GENE" == itemType.upper( ) :
+				self.cursor.execute( "SELECT go_id, go_evidence_code_id FROM " + Config.DB_NAME + ".gene_go WHERE gene_id=%s AND gene_go_status='active'", [itemID] )
+			elif "UNIPROT" == itemType.upper( ) :
+				self.cursor.execute( "SELECT go_id, go_evidence_code_id FROM " + Config.DB_NAME + ".uniprot_go WHERE uniprot_id=%s AND uniprot_go_status='active'", [itemID] )
 		
 			for row in self.cursor.fetchall( ) :
 				(goID, goName, goType) = self.goDefs[str(row[0])]
@@ -96,6 +100,38 @@ class Quick( ) :
 		
 		return goProcess, goComponent, goFunction
 		
+	def fetchExternalsForRefseq( self, refseqIDs ) :
+	
+		externalIDSet = []
+		externalTypeSet = []
+	
+		if len(refseqIDs) > 0 :
+			sqlFormat = ",".join( ['%s'] * len(refseqIDs) )
+			self.cursor.execute( "SELECT refseq_accession, refseq_gi, refseq_version FROM " + Config.DB_NAME + ".refseq WHERE refseq_id IN (%s) and refseq_status='active'" % sqlFormat, tuple(refseqIDs) )
+
+			for row in self.cursor.fetchall( ) :
+				externalIDSet.extend( [str(row[0]), str(row[1])] )
+				externalTypeSet.extend( ["REFSEQ-PROTEIN-ACCESSION", "REFSEQ-PROTEIN-GI"] )
+				
+				for version in range( 0, row[2] ) :
+					externalIDSet.append( str(row[0]) + "." + str(version+1) )
+					externalTypeSet.append( "REFSEQ-PROTEIN-ACCESSION-VERSIONED" )
+				
+			self.cursor.execute( "SELECT refseq_identifier_value, refseq_identifier_type FROM " + Config.DB_NAME + ".refseq_identifiers WHERE refseq_id IN (%s) and refseq_identifier_status='active'" % sqlFormat, tuple(refseqIDs) )
+
+			for row in self.cursor.fetchall( ) :
+				externalIDSet.append( str(row[0]) )
+				
+				refseqType = "REFSEQ"
+				if "rna-accession" == row[1].lower( ) :
+					refseqType = "REFSEQ-RNA-ACCESSION"	
+				elif "rna-gi" == row[1].lower( ) :
+					refseqType = "REFSEQ-RNA-GI"
+					
+				externalTypeSet.append( refseqType )
+				
+		return externalIDSet, externalTypeSet
+		
 	def fetchExternals( self, geneID, refseqIDs ) :
 	
 		externalIDSet = []
@@ -108,30 +144,11 @@ class Quick( ) :
 				externalIDSet.append( str(row[0]) )
 				externalTypeSet.append( row[1] )
 				
-			if len(refseqIDs) > 0 :
-				sqlFormat = ",".join( ['%s'] * len(refseqIDs) )
-				self.cursor.execute( "SELECT refseq_accession, refseq_gi, refseq_version FROM " + Config.DB_NAME + ".refseq WHERE refseq_id IN (%s) and refseq_status='active'" % sqlFormat, tuple(refseqIDs) )
-	
-				for row in self.cursor.fetchall( ) :
-					externalIDSet.extend( [str(row[0]), str(row[1])] )
-					externalTypeSet.extend( ["REFSEQ-PROTEIN-ACCESSION", "REFSEQ-PROTEIN-GI"] )
-					
-					for version in range( 0, row[2] ) :
-						externalIDSet.append( str(row[0]) + "." + str(version+1) )
-						externalTypeSet.append( "REFSEQ-PROTEIN-ACCESSION-VERSIONED" )
-					
-				self.cursor.execute( "SELECT refseq_identifier_value, refseq_identifier_type FROM " + Config.DB_NAME + ".refseq_identifiers WHERE refseq_id IN (%s) and refseq_identifier_status='active'" % sqlFormat, tuple(refseqIDs) )
-	
-				for row in self.cursor.fetchall( ) :
-					externalIDSet.append( str(row[0]) )
-					
-					refseqType = "REFSEQ"
-					if "rna-accession" == row[1].lower( ) :
-						refseqType = "REFSEQ-RNA-ACCESSION"	
-					elif "rna-gi" == row[1].lower( ) :
-						refseqType = "REFSEQ-RNA-GI"
-						
-					externalTypeSet.append( refseqType )
+			refseqExternals, refseqExternalTypes = self.fetchExternalsForRefseq( refseqIDs )
+			
+			if len(refseqExternals) > 0 :
+				externalIDSet.extend(refseqExternals)
+				externalTypeSet.extend(refseqExternalTypes)
 	
 		return externalIDSet, externalTypeSet
 		
@@ -267,4 +284,156 @@ class Quick( ) :
 				
 				
 		return description
+		
+	def fetchProtein( self, proteinRefID, proteinType ) :
+	
+		proteinDetails = []
+		if len(proteinRefID) > 0 :
 			
+			if "UNIPROT" == proteinType.upper( ) :
+				proteinDetails = self.fetchUniprotProtein( proteinRefID )
+			elif "REFSEQ" == proteinType.upper( ) :
+				proteinDetails = self.fetchRefseqProtein( proteinRefID )
+			elif "UNIPROT-ISOFORM" == proteinType.upper( ) :
+				proteinDetails = self.fetchUniprotIsoformProtein( proteinRefID )
+			else :
+				proteinDetails = False
+			
+		return proteinDetails
+			
+	def fetchUniprotProtein( self, uniprotID ) :
+	
+		self.cursor.execute( "SELECT * FROM " + Config.DB_NAME + ".uniprot WHERE uniprot_id=%s and uniprot_status='active' LIMIT 1", [uniprotID] )
+		
+		row = self.cursor.fetchone( )
+		return row
+		
+	def fetchRefseqProtein( self, refseqID ) :
+	
+		self.cursor.execute( "SELECT * FROM " + Config.DB_NAME + ".refseq WHERE refseq_id=%s and refseq_status='active' LIMIT 1", [refseqID] )
+		
+		row = self.cursor.fetchone( )
+		return row
+		
+	def fetchUniprotIsoformProtein( self, uniprotIsoformID ) :
+	
+		self.cursor.execute( "SELECT * FROM " + Config.DB_NAME + ".uniprot_isoforms WHERE uniprot_isoform_id=%s and uniprot_isoform_status='active' LIMIT 1", [uniprotIsoformID] )
+		
+		row = self.cursor.fetchone( )
+		return row
+		
+	def fetchUniprotExternals( self, uniprotID, refseqIDs ) :
+	
+		externalIDSet = []
+		externalTypeSet = []
+		geneIDs = []
+		
+		self.cursor.execute( "SELECT uniprot_external_value, uniprot_external_source FROM " + Config.DB_NAME + ".uniprot_externals WHERE uniprot_id=%s AND uniprot_external_source != 'REFSEQ' AND uniprot_external_status='active'", [uniprotID] )
+		
+		for row in self.cursor.fetchall( ) :
+		
+			value = str(row[0]).upper( ).replace( "HGNC:", "" ).replace( "MGI:", "" ).replace( "RGD:", "" )
+		
+			externalIDSet.append( value )
+			externalTypeSet.append( row[1] )
+			
+			if "ENTREZ_GENE" == row[1].upper( ) :
+				geneIDs.append( str(row[0]) )
+			
+		if len(refseqIDs) > 0 :
+			refseqExternals, refseqExternalTypes = self.fetchExternalsForRefseq( refseqIDs )
+				
+			if len(refseqExternals) > 0 :
+				externalIDSet.extend(refseqExternals)
+				externalTypeSet.extend(refseqExternalTypes)
+				
+		return externalIDSet, externalTypeSet, geneIDs
+		
+	def fetchRefseqIDsByUniprotID( self, uniprotID ) :
+	
+		refseqIDs = set( )
+		if len(uniprotID) > 0 :
+			self.cursor.execute( "SELECT refseq_id FROM " + Config.DB_NAME + ".protein_mapping WHERE uniprot_id=%s AND protein_mapping_status='active'", [uniprotID] )
+			
+			for row in self.cursor.fetchall( ) :
+				refseqIDs.add( str(row[0]) )
+				
+		return refseqIDs
+		
+	def fetchGeneIDsByEntrezGeneIDs( self, entrezGeneIDs ) :
+	
+		geneIDs = set( )
+		if len(entrezGeneIDs) > 0 :
+			sqlFormat = ",".join( ['%s'] * len(entrezGeneIDs) )
+			self.cursor.execute( "SELECT gene_id FROM " + Config.DB_NAME + ".genes WHERE gene_source_id IN (%s) AND gene_source='ENTREZ' AND gene_status='active'" % sqlFormat, tuple(entrezGeneIDs) )
+			
+			for row in self.cursor.fetchall( ) :
+				geneIDs.add( str(row[0]) )
+				
+		return geneIDs
+		
+	def fetchGeneIDByRefseqID( self, refseqID ) :
+	
+		geneIDs = set( )
+		if len(refseqID) > 0 :
+			self.cursor.execute( "SELECT gene_id FROM " + Config.DB_NAME + ".gene_refseqs WHERE refseq_id=%s AND gene_refseq_status='active' LIMIT 1", [refseqID] )
+			
+			row = self.cursor.fetchone( )
+			if None != row :
+				return str(row[0])
+				
+		return False
+		
+	def hasFeatures( self, uniprotID ) :
+		
+		self.cursor.execute( "SELECT uniprot_feature_id FROM " + Config.DB_NAME + ".uniprot_features WHERE uniprot_id=%s AND uniprot_feature_status='active' LIMIT 1", [uniprotID] )
+		row = self.cursor.fetchone( )
+		
+		if None == row :
+			return False
+			
+		return True
+		
+	def fetchUniprotAliases( self, uniprotID, geneIDs, primaryIdentifier ) :
+	
+		aliases = []
+		
+		if len(uniprotID) > 0 :
+		
+			self.cursor.execute( "SELECT uniprot_alias_value FROM " + Config.DB_NAME + ".uniprot_aliases WHERE uniprot_id=%s AND uniprot_alias_status='active'", [uniprotID] )
+						
+			for row in self.cursor.fetchall( ) :
+				if row[0].upper( ) != primaryIdentifier.upper( ) :
+					aliases.append( str(row[0]) )
+					
+		if len(geneIDs) > 0 :
+			for geneID in geneIDs :
+				systematicName, geneAliases = self.fetchAliases( geneID, primaryIdentifier )
+				
+				if "-" != systematicName :
+					aliases.append( systematicName )
+				
+				if len(geneAliases) > 0 :
+					aliases.extend( geneAliases )
+						
+		return set( aliases )
+		
+	def fetchOfficialSymbol( self, geneID ) :
+	
+		self.cursor.execute( "SELECT gene_name FROM " + Config.DB_NAME + ".genes WHERE gene_id=%s LIMIT 1", [geneID] )
+		row = self.cursor.fetchone( )
+		
+		if None == row :
+			return "-"
+			
+		return row[0]
+		
+	def fetchCurationStatus( self, geneID, refseqID ) :
+	
+		self.cursor.execute( "SELECT refseq_status FROM " + Config.DB_NAME + ".gene_refseqs WHERE gene_id=%s AND refseq_id=%s LIMIT 1", [geneID, refseqID] )
+		row = self.cursor.fetchone( )
+		
+		if None == row :
+			return "-"
+			
+		return row[0]
