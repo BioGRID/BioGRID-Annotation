@@ -68,7 +68,7 @@ with Database.db as cursor :
 		geneRecord.append( str(row[9]) ) # Gene Source
 		
 		# GRAB Gene Ontology Details
-		goProcess, goComponent, goFunction = quick.fetchGO( geneID )
+		goProcess, goComponent, goFunction = quick.fetchGO( geneID, "GENE" )
 		goCombined = {"IDS" : [], "NAMES" : [], "EVIDENCE" : []}
 		
 		goProcess, goCombined = quick.formatGOSet( goProcess, goCombined )
