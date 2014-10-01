@@ -437,3 +437,13 @@ class Quick( ) :
 			return "-"
 			
 		return row[0]
+		
+	def fetchUniprotIsoformParent( self, uniprotID ) :
+		
+		self.cursor.execute( "SELECT protein_id FROM " + Config.DB_NAME + ".proteins WHERE protein_reference_id=%s and protein_source='UNIPROT'", [uniprotID] )
+		row = self.cursor.fetchone( )
+		
+		if None == row :
+			return "0"
+		
+		return row[0]
