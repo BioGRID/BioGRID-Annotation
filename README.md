@@ -119,3 +119,7 @@ Once the annotation database is completed via the steps list above, we generate 
 + Run: **python QUICK_buildAnnotation.py** - This will generate a quick lookup table of gene annotation. The table containing this data is simply named _quick_annotation_ due to legacy purposes.
 
 + Run: **python QUICK_buildIdentifiers.py** - This will generate a quick lookup table of gene identifiers. The table containing this data is simply named _quick_identifiers_ due to legacy purposes.
+
++ Run: **python QUICK_buildProteins.py** - This will generate a quick lookup table of proteins.
+
++ Run: **python QUICK_buildProteinIdentifiers.py** - This will generate a quick lookup table of protein identifiers.

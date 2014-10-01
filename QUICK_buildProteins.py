@@ -18,9 +18,13 @@ with Database.db as cursor :
 	cursor.execute( "TRUNCATE TABLE " + Config.DB_QUICK + ".quick_proteins" )
 	Database.db.commit( )
 	
-	cursor.execute( "SELECT * FROM " + Config.DB_NAME + ".proteins WHERE protein_status='active' AND protein_source != 'UNIPROT-ISOFORM' ORDER BY protein_id ASC LIMIT 1000" )
+	cursor.execute( "SELECT * FROM " + Config.DB_NAME + ".proteins WHERE protein_status='active' ORDER BY protein_id ASC" )
 	
+	proteinCount = 0
 	for row in cursor.fetchall( ) :
+	
+		proteinCount = proteinCount + 1
+		print "Working on: " + str(proteinCount)
 	
 		proteinRecord = []
 		proteinID = str(row[0])
@@ -31,8 +35,10 @@ with Database.db as cursor :
 		proteinDetails = quick.fetchProtein( proteinReferenceID, proteinType )
 		
 		genes = "-"
+		officialSymbol = "-"
 		hasFeatures = "false"
 		proteinOrder = 1
+		proteinParent = 0
 		
 		goProcess = { "IDS" : [], "NAMES" : [], "EVIDENCE" : [] }
 		goComponent = { "IDS" : [], "NAMES" : [], "EVIDENCE" : [] }
@@ -48,6 +54,8 @@ with Database.db as cursor :
 		
 			if "UNIPROT" == proteinType.upper( ) :
 				organismIndex = 11
+				
+				officialSymbol = proteinDetails[1]
 				
 				# Fetch REFSEQ IDs, ENTREZ GENE IDs, and EXTERNAL REFERENCES for the Uniprot Protein
 				refseqIDs = quick.fetchRefseqIDsByUniprotID( proteinReferenceID )
@@ -73,6 +81,8 @@ with Database.db as cursor :
 				
 			elif "REFSEQ" == proteinType.upper( ) :
 				organismIndex = 7
+				
+				officialSymbol = proteinDetails[1]
 				
 				# Get actual GENE IDs for the Entrez Gene IDs
 				geneID = quick.fetchGeneIDByRefseqID( proteinReferenceID )
@@ -112,9 +122,35 @@ with Database.db as cursor :
 
 			elif "UNIPROT-ISOFORM" == proteinType.upper( ) :
 				organismIndex = 9
+				
+				officialSymbol = proteinDetails[1] + "-" + str(proteinDetails[2])
+				proteinParent = quick.fetchUniprotIsoformParent( str(proteinDetails[10]) )
+				proteinOrder = proteinDetails[2]
+				
+				# Fetch REFSEQ IDs, ENTREZ GENE IDs, and EXTERNAL REFERENCES for the Uniprot Protein
+				refseqIDs = quick.fetchRefseqIDsByUniprotID( str(proteinDetails[10]) )
+				externalIDs, externalTypes, entrezGeneIDs = quick.fetchUniprotExternals( str(proteinDetails[10]), refseqIDs )
+				
+				# Get actual GENE IDs for the Entrez Gene IDs
+				geneIDs = quick.fetchGeneIDsByEntrezGeneIDs( entrezGeneIDs )
+				
+				if len(geneIDs) > 0 :
+					genes = "|".join(geneIDs)
+				
+				# Aliases
+				aliases = quick.fetchUniprotAliases( proteinReferenceID, geneIDs, proteinDetails[1] )
+				
+				# Sequence, Sequence Length, Name, Description, Source, Version, Curation Status
+				proteinMiddle = [proteinDetails[3], proteinDetails[4], proteinDetails[5], proteinDetails[6], 'UNIPROT-ISOFORM', '1', 'Isoform']
+				
+				if quick.hasFeatures( proteinReferenceID ) :
+					hasFeatures = "true"
+					
+				# Fetch GENE ONTOLOGY
+				goProcess, goComponent, goFunction = quick.fetchGO( proteinReferenceID, "UNIPROT" )
 			
 			# Primary Identifier and Isoform Number
-			proteinRecord.extend( [proteinDetails[1],'1'] )
+			proteinRecord.extend( [officialSymbol,'1'] )
 			
 			# Aliases
 			if len( aliases ) <= 0 :
@@ -171,9 +207,14 @@ with Database.db as cursor :
 			# Get organism info out of the hash
 			(orgID, orgEntrezID, orgUniprotID, orgName, orgOfficial, orgAbbr, orgStrain) = orgHash[str(proteinDetails[organismIndex])]
 			proteinRecord.extend( [str(orgID), orgName, orgOfficial, orgAbbr, orgStrain] )
-			proteinRecord.extend( [proteinOrder,"0",genes] )
+			proteinRecord.extend( [proteinOrder, proteinParent,"0",genes] )
 		
 		sqlFormat = ",".join( ['%s'] * len(proteinRecord) )
 		cursor.execute( "INSERT INTO " + Config.DB_QUICK + ".quick_proteins VALUES( %s )" % sqlFormat, tuple(proteinRecord) )
 
 		proteinRecord = []
+		
+	cursor.execute( "INSERT INTO " + Config.DB_STATS + ".update_tracker VALUES ( '0', 'QUICK_buildProteins', NOW( ) )" )
+	Database.db.commit( )
+	
+sys.exit( )
