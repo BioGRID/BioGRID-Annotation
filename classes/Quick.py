@@ -447,3 +447,13 @@ class Quick( ) :
 			return "0"
 		
 		return row[0]
+		
+	def fetchProteinIDByUniprotID( self, uniprotID ) :
+		
+		self.cursor.execute( "SELECT protein_id FROM " + Config.DB_NAME + ".proteins WHERE protein_reference_id=%s AND protein_source = 'UNIPROT' AND protein_status='active'", [uniprotID] )
+		row = self.cursor.fetchone( )
+		
+		if None == row :
+			return False
+			
+		return row[0]
