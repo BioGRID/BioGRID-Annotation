@@ -125,3 +125,6 @@ Once the annotation database is completed via the steps list above, we generate 
 + Run: **python QUICK_buildProteinIdentifiers.py** - This will generate a quick lookup table of protein identifiers.
 
 + Run: **python QUICK_buildProteinFeatures.py** - This will generate a quick lookup table of protein features.
+
+#### TESTING
+These calls are mostly for internal BioGRID based testing to validate the final resulting annotation before rolling it out to various different applications within our ecosystem. Likely not of much use to third parties.
