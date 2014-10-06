@@ -457,3 +457,13 @@ class Quick( ) :
 			return False
 			
 		return row[0]
+		
+	def fetchValidGeneIDHash( self ) :
+	
+		self.cursor.execute( "SELECT gene_id FROM " + Config.DB_QUICK + ".quick_annotation" )
+		
+		geneHash = set( )
+		for row in self.cursor.fetchall( ) :
+			geneHash.add( str(row[0]) )
+			
+		return geneHash

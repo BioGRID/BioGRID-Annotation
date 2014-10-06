@@ -49,5 +49,10 @@
 	"APP" : {
 		"EMAIL"							: "EMAIL ADDRESS",
 		"TOOL"							: "Annotation Download"
+	},
+	
+	"TEST" : {
+		"DB_IMS"						: "",
+		"DB_OLDQUICK"					: ""
 	}
 }
