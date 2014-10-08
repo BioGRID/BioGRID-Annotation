@@ -20,7 +20,7 @@ searchData["email"] = Config.APP_EMAIL
 searchData["tool"] = Config.APP_TOOL
 
 MAX_ITERATIONS = 10
-MAX_PER = 5000
+MAX_PER = 100
 
 with Database.db as cursor :
 

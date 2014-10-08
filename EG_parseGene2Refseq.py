@@ -100,8 +100,18 @@ with Database.db as cursor :
 		refseqSplit = missingRefseq.split( "|" )
 		
 		if "NP" == refseqSplit[0][:2] and int(refseqSplit[2]) in organismList :
-			cursor.execute( "INSERT INTO " + Config.DB_NAME + ".refseq VALUES( '0', %s, '0', '', '0', '', '1', %s, NOW( ), 'active' )", [refseqSplit[0], organismList[int(refseqSplit[2])]] )
-			refseqID = cursor.lastrowid
+		
+			cursor.execute( "SELECT refseq_id FROM " + Config.DB_NAME + ".refseq WHERE refseq_accession=%s LIMIT 1", [refseqSplit[0]] )
+			row = cursor.fetchone( )
+			
+			refseqID = ""
+			if None == row :
+				cursor.execute( "INSERT INTO " + Config.DB_NAME + ".refseq VALUES( '0', %s, '0', '', '0', '', '1', %s, NOW( ), 'active' )", [refseqSplit[0], organismList[int(refseqSplit[2])]] )
+				refseqID = cursor.lastrowid
+			else :
+				cursor.execute( "UPDATE " + Config.DB_NAME + ".refseq SET organism_id=%s, refseq_status='active' WHERE refseq_id=%s", [organismList[int(refseqSplit[2])], str(row[0])] )
+				refseqID = str(row[0])
+			
 			cursor.execute( "INSERT INTO " + Config.DB_NAME + ".gene_refseqs VALUES( '0', %s, %s, 'active', NOW( ), %s )", [refseqID, refseqSplit[3], refseqSplit[1]] )
 		else :
 			cursor.execute( "INSERT INTO " + Config.DB_NAME + ".gene_externals VALUES( '0', %s, 'REFSEQ_LEGACY', 'active', NOW( ), %s )", [refseqSplit[0], refseqSplit[1]] )

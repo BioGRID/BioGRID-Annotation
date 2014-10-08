@@ -56,6 +56,8 @@ with Database.db as cursor :
 					
 		for accession,sequenceInfo in sequences.items( ) :
 		
+			accession = accession.strip( )
+		
 			sequence = "".join( sequenceInfo["SEQUENCE"] )
 			sequenceLength = len( sequence )
 		
