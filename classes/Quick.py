@@ -467,3 +467,13 @@ class Quick( ) :
 			geneHash.add( str(row[0]) )
 			
 		return geneHash
+		
+	def fetchValidProteinIDHash( self ) :
+	
+		self.cursor.execute( "SELECT protein_id FROM " + Config.DB_QUICK + ".quick_proteins" )
+		
+		proteinHash = set( )
+		for row in self.cursor.fetchall( ) :
+			proteinHash.add( str(row[0]) )
+			
+		return proteinHash
