@@ -17,7 +17,7 @@ with Database.db as cursor :
 	cursor.execute( "TRUNCATE TABLE " + Config.DB_QUICK + ".quick_identifiers" )
 	Database.db.commit( )
 	
-	cursor.execute( "SELECT gene_id, systematic_name, official_symbol, aliases, definition, external_ids, external_ids_types, organism_id, organism_common_name, organism_official_name, organism_abbreviation, organism_strain FROM " + Config.DB_QUICK + ".quick_annotation" )
+	cursor.execute( "SELECT gene_id, systematic_name, official_symbol, aliases, definition, external_ids, external_ids_types, organism_id, organism_common_name, organism_official_name, organism_abbreviation, organism_strain, protein_aliases FROM " + Config.DB_QUICK + ".quick_annotation" )
 	
 	recordSize = 12 # Number of Columns in quick_identifiers table
 	
@@ -27,6 +27,8 @@ with Database.db as cursor :
 	insertCount = 0
 	for row in cursor.fetchall( ) :
 	
+		duplicates = set( )
+	
 		record = [row[0]] # Before ID data
 		recordBase = [row[1],row[2],row[4],row[7],row[8],row[9],row[10],row[11], '0'] # After ID Data
 		
@@ -35,15 +37,25 @@ with Database.db as cursor :
 		if "-" != row[1] :
 			cursor.execute( query, tuple(record + [row[1], "SYSTEMATIC NAME"] + recordBase) )
 			cursor.execute( query, tuple(record + [row[1], "ORDERED LOCUS"] + recordBase) )
+			duplicates.add( str(row[1].upper( )) )
 			
 		if "-" != row[2] :
 			cursor.execute( query, tuple(record + [row[2], "OFFICIAL SYMBOL"] + recordBase) )
+			duplicates.add( str(row[2].upper( )) )
 			
 		if "-" != row[3] :
 			aliases = row[3].split( "|" )
 			for alias in aliases :
-				if alias.upper( ) != row[1].upper( ) and alias.upper( ) != row[2].upper( ) :
+				if alias.upper( ) != row[1].upper( ) and alias.upper( ) != row[2].upper( ) and str(alias.upper( )) not in duplicates :
 					cursor.execute( query, tuple(record + [alias, "SYNONYM"] + recordBase) )
+					duplicates.add( str(alias.upper( )) )
+					
+		if "-" != row[12] :
+			aliases = row[12].split( "|" )
+			for alias in aliases :
+				if alias.upper( ) != row[1].upper( ) and alias.upper( ) != row[2].upper( ) and str(alias.upper( )) not in duplicates :
+					cursor.execute( query, tuple(record + [alias, "SYNONYM"] + recordBase) )
+					duplicates.add( str(alias.upper( )) )
 				
 		if "-" != row[5] :
 			externalIDs = row[5].split( "|" )
