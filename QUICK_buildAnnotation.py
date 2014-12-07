@@ -34,14 +34,18 @@ with Database.db as cursor :
 		
 		# Grab all aliases and a systematic name (if applicable)
 		systematicName, aliases = quick.fetchAliases( geneID, officialSymbol )
-		uniprotAliases, uniprotExternals, uniprotExternalTypes = quick.fetchUniprotNamesForGenes( uniprotIDs )
-		
-		aliases = set( aliases + uniprotAliases )
 		
 		if len( aliases ) <= 0 :
 			aliases = "-"
 		else :
 			aliases = "|".join(aliases)
+			
+		uniprotAliases, uniprotExternals, uniprotExternalTypes = quick.fetchUniprotNamesForGenes( uniprotIDs )
+		
+		if len( uniprotAliases ) <= 0 :
+			uniprotAliases = "-"
+		else :
+			uniprotAliases = "|".join(uniprotAliases)
 			
 		geneRecord.extend( [systematicName, officialSymbol, aliases] )
 			
@@ -95,6 +99,9 @@ with Database.db as cursor :
 		
 		# Protein IDs - Empty for Now, Filled in Later
 		geneRecord.append( "-" )
+		
+		# Protein Aliases 
+		geneRecord.append( uniprotAliases )
 		
 		# Interaction Count
 		geneRecord.append( "0" )
