@@ -155,6 +155,7 @@ class Quick( ) :
 	def fetchAliases( self, geneID, officialSymbol ) :
 	
 		aliases = []
+		uniqueAliases = set( )
 		systematicName = "-"
 		
 		if len(geneID) > 0 :
@@ -165,8 +166,9 @@ class Quick( ) :
 				if "ordered locus" == row[1] :
 					systematicName = str(row[0])
 				else :
-					if row[0].upper( ) != officialSymbol.upper( ) :
+					if str(row[0].upper( )) != str(officialSymbol.upper( )) and str(row[0].upper( )) not in uniqueAliases :
 						aliases.append( str(row[0]) )
+						uniqueAliases.add( str(row[0].upper( )) )
 						
 		return systematicName, aliases
 		
