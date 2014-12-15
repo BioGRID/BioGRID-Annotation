@@ -58,3 +58,6 @@ config/config.json
 
 # Misc
 .listing
+
+# Logs
+logs/
