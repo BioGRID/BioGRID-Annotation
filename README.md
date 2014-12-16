@@ -20,6 +20,7 @@ To use all of the tools contained within, you require at least the following:
 + xml.etree
 + glob
 + re
++ argparse
 
 ### Required Databases (from SQL directory if starting fresh)
 + core_staging - Tables used for staging data before updating.
@@ -105,7 +106,7 @@ Make sure you have a loaded copy of the annotation database tables to use for th
 
 + Run: **python PROTEIN_buildConsolidatedSet.py** - This will update the _proteins_ table to create a consolidated UNIPROT/REFSEQ protein table. UNIPROT is considered the primary and REFSEQ is only loaded when no valid mapping to a UNIPROT exists in the previously loaded tables.
 
-### Quick Lookup Table Generation
+## Quick Lookup Table Generation
 Once the annotation database is completed via the steps list above, we generate several quick lookup tables that facilitate rapid searching without requiring large joins or complicated SQL queries. These tables may take some time to complete, so be prepared for a lengthy process depending on your resources available.
 
 + Create a database containing a empty set of the quick_annotation tables. A reference SQL file can be found in the SQL folder.
@@ -126,5 +127,13 @@ Once the annotation database is completed via the steps list above, we generate 
 
 + Run: **python QUICK_buildProteinFeatures.py** - This will generate a quick lookup table of protein features.
 
-#### TESTING
+## Testing
 These calls are mostly for internal BioGRID based testing to validate the final resulting annotation before rolling it out to various different applications within our ecosystem. Likely not of much use to third parties.
+
+## Maintenance
+These calls are mostly for maintaining an existing annotation database such as adding additional organisms or updating annotation on existing records.
+
+### Load a New Organism
+Ensure that the organism is loaded into the _organisms_ table prior to starting
+
++ Run: **python EG_updateGenes.py -o <NCBI ORGANISM ID>** - This will run through the gene_info file and selectively process only the organism you passed in via the -o parameter.
