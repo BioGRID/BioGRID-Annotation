@@ -111,4 +111,14 @@ class EntrezGene( ) :
 			organismList[organismEntrezID] = organismID
 			
 		return organismList
+		
+	def fetchExistingEntrezGeneIDsByOrganism( self, organismID ) :
+		
+		self.cursor.execute( "SELECT gene_id, gene_source_id FROM " + Config.DB_NAME + ".genes WHERE organism_id=%s", [organismID] )
+		
+		idList = { }
+		for row in self.cursor.fetchall( ) :
+			idList[row[1]] = row[0]
+			
+		return idList
 				

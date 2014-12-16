@@ -20,6 +20,7 @@ To use all of the tools contained within, you require at least the following:
 + xml.etree
 + glob
 + re
++ argparse
 
 ### Required Databases (from SQL directory if starting fresh)
 + core_staging - Tables used for staging data before updating.
@@ -126,5 +127,13 @@ Once the annotation database is completed via the steps list above, we generate 
 
 + Run: **python QUICK_buildProteinFeatures.py** - This will generate a quick lookup table of protein features.
 
-#### TESTING
+## Testing
 These calls are mostly for internal BioGRID based testing to validate the final resulting annotation before rolling it out to various different applications within our ecosystem. Likely not of much use to third parties.
+
+## Maintenance
+These calls are mostly for maintaining an existing annotation database such as adding additional organisms or updating annotation on existing records.
+
+### Load a New Organism
+Ensure that the organism is loaded into the _organisms_ table prior to starting
+
++ Run: **python EG_updateGenes.py -o <NCBI ORGANISM ID>** - This will run through the gene_info file and selectively process only the organism you passed in via the -o parameter.
