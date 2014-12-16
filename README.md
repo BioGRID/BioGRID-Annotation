@@ -106,7 +106,7 @@ Make sure you have a loaded copy of the annotation database tables to use for th
 
 + Run: **python PROTEIN_buildConsolidatedSet.py** - This will update the _proteins_ table to create a consolidated UNIPROT/REFSEQ protein table. UNIPROT is considered the primary and REFSEQ is only loaded when no valid mapping to a UNIPROT exists in the previously loaded tables.
 
-### Quick Lookup Table Generation
+## Quick Lookup Table Generation
 Once the annotation database is completed via the steps list above, we generate several quick lookup tables that facilitate rapid searching without requiring large joins or complicated SQL queries. These tables may take some time to complete, so be prepared for a lengthy process depending on your resources available.
 
 + Create a database containing a empty set of the quick_annotation tables. A reference SQL file can be found in the SQL folder.
