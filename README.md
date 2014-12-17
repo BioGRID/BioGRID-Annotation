@@ -133,8 +133,18 @@ These calls are mostly for internal BioGRID based testing to validate the final 
 ## Maintenance
 These calls are mostly for maintaining an existing annotation database such as adding additional organisms or updating annotation on existing records.
 
-### Load a New Organism
+### Loading a New Organism
 Ensure that the organism is loaded into the _organisms_ table prior to starting
+
+#### Process REFSEQ Proteins
+
++ Run: **python REFSEQ_updateProteinIDs.py -o [NCBI ORGANISM ID]** - This will connect to NCBI and download UIDs for REFSEQ proteins into the staging table only for the specific organism passed via the -o parameter.
+
++ Run: **python REFSEQ_downloadProteins.py** - This will download protein FASTA files for all the protein IDs downloaded into the staging database.
+
++ Run: **python REFSEQ_parseProteinFile.py -f [FILENAME] - Run this call for each of the files generated in the previous step. This will update or load these sequences into the _refseq_ table of the database.
+
+#### Process ENTREZ GENE
 
 + Run: **python EG_updateGenes.py -o [NCBI ORGANISM ID]** - This will run through the gene_info file and selectively process only the organism you passed in via the -o parameter.
 
