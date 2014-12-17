@@ -142,7 +142,7 @@ Ensure that the organism is loaded into the _organisms_ table prior to starting
 
 + Run: **python REFSEQ_downloadProteins.py** - This will download protein FASTA files for all the protein IDs downloaded into the staging database.
 
-+ Run: **python REFSEQ_parseProteinFile.py -f [FILENAME] - Run this call for each of the files generated in the previous step. This will update or load these sequences into the _refseq_ table of the database.
++ Run: **python REFSEQ_parseProteinFile.py -f [FILENAME]** - Run this call for each of the files generated in the previous step. This will update or load these sequences into the _refseq_ table of the database.
 
 #### Process ENTREZ GENE
 
