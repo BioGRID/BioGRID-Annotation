@@ -141,3 +141,5 @@ Ensure that the organism is loaded into the _organisms_ table prior to starting
 + Run: **python EG_updateAliases.py -o [NCBI ORGANISM ID]** - This will run through the gene_info file and selectively process only the organism you passed in via the -o parameter and grab only aliases.
 
 + Run: **python EG_updateExternals.py -o [NCBI ORGANISM ID]** - This will run through the gene_info file and selectively process only the organism you passed in via the -o parameter and grab only external identifiers.
+
++ Run: **python EG_updateDefinitions.py -o [NCBI ORGANISM ID]** - This will run through the gene_info file and selectively process only the organism you passed in via the -o parameter and grab only definitions.
