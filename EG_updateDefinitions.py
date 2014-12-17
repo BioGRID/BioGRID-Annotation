@@ -11,7 +11,7 @@ import gzip
 from classes import EntrezGene
 
 # Process Command Line Input
-argParser = argparse.ArgumentParser( description = 'Update all genes from Entrez Gene that are relevant to the organism id passed in via the command line.' )
+argParser = argparse.ArgumentParser( description = 'Update all Definitions from Entrez Gene that are relevant to the organism id passed in via the command line.' )
 argParser.add_argument( '-o', help = 'NCBI Organism ID', type=int, dest = 'organismID', required=True, action='store' )
 inputArgs = vars( argParser.parse_args( ) )
 
@@ -92,6 +92,8 @@ with Database.db as cursor :
 			
 			if 0 == (insertCount % Config.DB_COMMIT_COUNT ) :
 				Database.db.commit( )
+				
+	Database.db.commit( )
 				
 	cursor.execute( "INSERT INTO " + Config.DB_STATS + ".update_tracker VALUES ( '0', 'EG_updateDefinitions', NOW( ) )" )
 	Database.db.commit( )

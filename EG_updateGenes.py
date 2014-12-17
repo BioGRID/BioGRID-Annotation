@@ -72,6 +72,8 @@ with Database.db as cursor :
 			if 0 == (insertCount % Config.DB_COMMIT_COUNT ) :
 				Database.db.commit( )
 				
+	Database.db.commit( )
+				
 	cursor.execute( "INSERT INTO " + Config.DB_STATS + ".update_tracker VALUES ( '0', 'EG_updateGenes', NOW( ) )" )
 	Database.db.commit( )
 	
