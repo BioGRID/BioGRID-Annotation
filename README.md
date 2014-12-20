@@ -157,3 +157,15 @@ Ensure that the organism is loaded into the _organisms_ table prior to starting
 + Run: **python EG_updateGO.py -o [NCBI ORGANISM ID]** - This will run through the gene2go file and selectively process only the organism you passed in via the -o parameter and grab only go mappings that match.
 
 + Run: **python EG_updateGene2Ensembl.py -o [NCBI ORGANISM ID]** - This will run through the gene2ensembl file and selectively process only the organism you passed in via the -o parameter and grab only ensembl ids that match.
+
++ Run: **python EG_updateGene2Refseq.py -o [NCBI ORGANISM ID]** - This will run through the gene2refseq file and selectively process only the organism you passed in via the -o parameter and grab only the mappings and ids that match.
+
+#### Process REFSEQ MISSING
+
++ Run: **python REFSEQ_downloadMissingProteins.py** - This will download protein FASTA files for any proteins in the _refseq_ table that do not have annotation. These are most likely proteins that were added when running the EG_parseGene2Refseq.py script.
+
++ Run: **python REFSEQ_parseMissingProteins.py** - This will parse the FASTA files downloaded in the step above and load them into the database.
+
+#### Process UNIPROTKB
+
++ Run: **python UNIPROT_downloadProteins.py -o [BIOGRID ORGANISM ID]** - This will download a specific file containing sequences for the organism of interest.
