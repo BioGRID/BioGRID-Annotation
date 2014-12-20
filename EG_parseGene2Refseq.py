@@ -118,7 +118,7 @@ with Database.db as cursor :
 		
 	Database.db.commit( )
 				
-	cursor.execute( "INSERT INTO " + Config.DB_STATS + ".update_tracker VALUES ( '0', 'EG_parseExternals', NOW( ) )" )
+	cursor.execute( "INSERT INTO " + Config.DB_STATS + ".update_tracker VALUES ( '0', 'EG_parseGene2Refseq', NOW( ) )" )
 	Database.db.commit( )
 	
 sys.exit( )
