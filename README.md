@@ -169,3 +169,7 @@ Ensure that the organism is loaded into the _organisms_ table prior to starting
 #### Process UNIPROTKB
 
 + Run: **python UNIPROT_downloadProteins.py -o [BIOGRID ORGANISM ID]** - This will download a specific file containing sequences for the organism of interest.
+
++ Run: **python UNIPROT_updateProteins.py -o [BIOGRID ORGANISM ID]** - This will parse the specific files that were downloaded above.
+
++ Run: **python UNIPROT_parseIsoforms.py** - This will read the uniprot isoform datafile and load the isoforms into a separate table.

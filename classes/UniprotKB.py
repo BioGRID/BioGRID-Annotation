@@ -44,8 +44,15 @@ class UniprotKB( ) :
 			
 		sequence = ("".join( isoEntry['SEQUENCE'] )).upper( )
 		sequenceLength = str(len(sequence))
+		
+		self.cursor.execute( "SELECT uniprot_isoform_id FROM " + Config.DB_NAME + ".uniprot_isoforms WHERE uniprot_isoform_accession=%s AND uniprot_isoform_number=%s LIMIT 1", [isoEntry["ACCESSION"], isoEntry["ISOFORM"]] )
+		row = self.cursor.fetchone( )
+		
+		if None == row :
+			self.cursor.execute( "INSERT INTO " + Config.DB_NAME + ".uniprot_isoforms VALUES( '0',%s,%s,%s,%s,%s,%s,'active',NOW( ),%s,%s )", [isoEntry["ACCESSION"], isoEntry["ISOFORM"], sequence, sequenceLength, isoEntry["NAME"], isoEntry["DESC"], organismID, uniprotID] )
+		else :
+			self.cursor.execute( "UPDATE " + Config.DB_NAME + ".uniprot_isoforms SET uniprot_isoform_sequence=%s, uniprot_isoform_sequence_length=%s, uniprot_isoform_name=%s, uniprot_isoform_description=%s, uniprot_isoform_status='active' WHERE uniprot_isoform_id=%s", [sequence, sequenceLength, isoEntry["NAME"], isoEntry["DESC"], row[0]] )
 			
-		self.cursor.execute( "INSERT INTO " + Config.DB_NAME + ".uniprot_isoforms VALUES( '0',%s,%s,%s,%s,%s,%s,'active',NOW( ),%s,%s )", [isoEntry["ACCESSION"], isoEntry["ISOFORM"], sequence, sequenceLength, isoEntry["NAME"], isoEntry["DESC"], organismID, uniprotID] )
 		self.db.commit( )
 		
 	def processProtein( self, uniprotEntry, organismID ) :
@@ -171,3 +178,14 @@ class UniprotKB( ) :
 					self.cursor.execute( "UPDATE " + Config.DB_NAME + ".uniprot_features SET uniprot_feature_description=%s, uniprot_feature_status='active' WHERE uniprot_feature_id=%s", [featureDesc, row[0]] )
 					
 			self.db.commit( )
+			
+	def fetchUniprotOrganismMapping( self ) :
+	
+		self.cursor.execute( "SELECT organism_id, organism_uniprot_taxid FROM " + Config.DB_NAME + ".organisms WHERE organism_status='active'" )
+		
+		organismList = {}
+		for row in self.cursor.fetchall( ) :
+			(organismID, organismUniprotID) = row
+			organismList[organismUniprotID] = organismID
+			
+		return organismList

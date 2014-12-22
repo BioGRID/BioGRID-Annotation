@@ -15,7 +15,7 @@ descRE = re.compile( '^([A-Z0-9]+_{1}[A-Z0-9]+) (.*?) (OS=.*?)? (GN=(.*?))?$', r
 
 with Database.db as cursor :
 
-	cursor.execute( "TRUNCATE TABLE " + Config.DB_NAME + ".uniprot_isoforms" )
+	cursor.execute( "UPDATE " + Config.DB_NAME + ".uniprot_isoforms SET uniprot_isoform_status='inactive'" )
 	Database.db.commit( )
 
 	uniprotKB = UniprotKB.UniprotKB( Database.db, cursor )
