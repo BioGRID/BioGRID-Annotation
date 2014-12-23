@@ -117,9 +117,9 @@ Once the annotation database is completed via the steps list above, we generate 
 
 + Run: **python QUICK_buildOrganisms.py** - This will create the _quick_organisms_ lookup table.
 
-+ Run: **python QUICK_buildAnnotation.py** - This will generate a quick lookup table of gene annotation. The table containing this data is simply named _quick_annotation_ due to legacy purposes.
++ Run: **python QUICK_buildAnnotation.py -all** - This will generate a quick lookup table of gene annotation. The table containing this data is simply named _quick_annotation_ due to legacy purposes.
 
-+ Run: **python QUICK_buildIdentifiers.py** - This will generate a quick lookup table of gene identifiers. The table containing this data is simply named _quick_identifiers_ due to legacy purposes.
++ Run: **python QUICK_buildIdentifiers.py -all** - This will generate a quick lookup table of gene identifiers. The table containing this data is simply named _quick_identifiers_ due to legacy purposes.
 
 + Run: **python QUICK_buildProteins.py** - This will generate a quick lookup table of proteins.
 
@@ -136,7 +136,7 @@ These calls are mostly for maintaining an existing annotation database such as a
 ### Loading a New Organism
 Ensure that the organism is loaded into the _organisms_ table prior to starting
 
-#### Process REFSEQ Proteins
+#### Update REFSEQ Proteins
 
 + Run: **python REFSEQ_updateProteinIDs.py -o [NCBI ORGANISM ID]** - This will connect to NCBI and download UIDs for REFSEQ proteins into the staging table only for the specific organism passed via the -o parameter.
 
@@ -144,7 +144,7 @@ Ensure that the organism is loaded into the _organisms_ table prior to starting
 
 + Run: **python REFSEQ_parseProteinFile.py -f [FILENAME]** - Run this call for each of the files generated in the previous step. This will update or load these sequences into the _refseq_ table of the database.
 
-#### Process ENTREZ GENE
+#### Update ENTREZ GENE
 
 + Run: **python EG_updateGenes.py -o [NCBI ORGANISM ID]** - This will run through the gene_info file and selectively process only the organism you passed in via the -o parameter.
 
@@ -160,16 +160,32 @@ Ensure that the organism is loaded into the _organisms_ table prior to starting
 
 + Run: **python EG_updateGene2Refseq.py -o [NCBI ORGANISM ID]** - This will run through the gene2refseq file and selectively process only the organism you passed in via the -o parameter and grab only the mappings and ids that match.
 
-#### Process REFSEQ MISSING
+#### Update REFSEQ MISSING
 
 + Run: **python REFSEQ_downloadMissingProteins.py** - This will download protein FASTA files for any proteins in the _refseq_ table that do not have annotation. These are most likely proteins that were added when running the EG_parseGene2Refseq.py script.
 
 + Run: **python REFSEQ_parseMissingProteins.py** - This will parse the FASTA files downloaded in the step above and load them into the database.
 
-#### Process UNIPROTKB
+#### Update UNIPROTKB
 
 + Run: **python UNIPROT_downloadProteins.py -o [BIOGRID ORGANISM ID]** - This will download a specific file containing sequences for the organism of interest.
 
 + Run: **python UNIPROT_updateProteins.py -o [BIOGRID ORGANISM ID]** - This will parse the specific files that were downloaded above.
 
 + Run: **python UNIPROT_parseIsoforms.py** - This will read the uniprot isoform datafile and load the isoforms into a separate table.
+
+#### Update PROTEIN MAPPING
+
++ Run: **python EG_updateGene2Uniprot.py** - This will update the mapping data from the Gene2Uniprot Collab file, into a protein mapping table.
+
++ Run: **python PROTEIN_mapIdenticalProteins.py** - This will check for identical sequences between the two protein databases and make a mapping if they are the same.
+
++ Run: **python PROTEIN_buildConsolidatedSet.py** - This will update the _proteins_ table to create a consolidated UNIPROT/REFSEQ protein table. UNIPROT is considered the primary and REFSEQ is only loaded when no valid mapping to a UNIPROT exists in the previously loaded tables.
+
+#### Update QUICK tables
+
++ Run: **python QUICK_buildOrganisms.py** - This will create the _quick_organisms_ lookup table.
+
++ Run: **python QUICK_buildAnnotation.py -o [BIOGRID ORGANISM ID]** - This will append or update the annotation for this organism in the _quick_annotation_ table. 
+
++ Run: **python QUICK_buildIdentifiers.py -o [BIOGRID ORGANISM ID]** - This will append or update the identifiers for this organism in the _quick_identifiers_ table. 
