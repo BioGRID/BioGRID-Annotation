@@ -4,21 +4,47 @@
 # resources into a single table.
 
 import Config
-import sys, string
+import sys, string, argparse
 import MySQLdb
 import Database
 
 from classes import Quick
+
+# Process Command Line Input
+argParser = argparse.ArgumentParser( description = 'Update all Annotation Records' )
+argGroup = argParser.add_mutually_exclusive_group( )
+argGroup.add_argument( '-o', dest='organismID', type = int, nargs = 1, help = 'An organism id to update annotation for', action='store' )
+argGroup.add_argument( '-g', dest='geneID', type = int, nargs = 1, help = 'A Gene ID to Update', action='store' )
+argGroup.add_argument( '-all', dest='allRecords', help = 'Build from All Records, Starting from Scratch', action='store_true' )
+inputArgs = vars( argParser.parse_args( ) )
+
+isOrganism = False
+isGene = False
+isAll = False
+
+if None != inputArgs['organismID'] :
+	isOrganism = True
+elif None != inputArgs['geneID'] :
+	isGene = True
+else :
+	isAll = True
 
 with Database.db as cursor :
 
 	quick = Quick.Quick( Database.db, cursor )
 	orgHash = quick.fetchOrganismHash( )
 
-	cursor.execute( "TRUNCATE TABLE " + Config.DB_QUICK + ".quick_annotation" )
-	Database.db.commit( )
+	if isOrganism :
+		cursor.execute( "SELECT * FROM " + Config.DB_NAME + ".genes WHERE organism_id=%s AND gene_status='active'", [inputArgs['organismID']] )
 	
-	cursor.execute( "SELECT * FROM " + Config.DB_NAME + ".genes WHERE gene_status='active'" )
+	elif isGene :
+		cursor.execute( "SELECT * FROM " + Config.DB_NAME + ".genes WHERE gene_id=%s AND gene_status='active'", [inputArgs['geneID']] )
+	
+	else :
+		cursor.execute( "TRUNCATE TABLE " + Config.DB_QUICK + ".quick_annotation" )
+		Database.db.commit( )
+		
+		cursor.execute( "SELECT * FROM " + Config.DB_NAME + ".genes WHERE gene_status='active'" )
 	
 	insertCount = 0
 	for row in cursor.fetchall( ) :
@@ -107,7 +133,22 @@ with Database.db as cursor :
 		geneRecord.append( "0" )
 		
 		sqlFormat = ",".join( ['%s'] * len(geneRecord) )
-		cursor.execute( "INSERT INTO " + Config.DB_QUICK + ".quick_annotation VALUES (%s)" % sqlFormat, tuple(geneRecord) )
+	
+		if isGene or isOrganism :
+			cursor.execute( "SELECT gene_id FROM " + Config.DB_QUICK + ".quick_annotation WHERE gene_id=%s LIMIT 1", [geneID] )
+			geneExists = cursor.fetchone( )
+			
+			if None == geneExists :
+				cursor.execute( "INSERT INTO " + Config.DB_QUICK + ".quick_annotation VALUES (%s)" % sqlFormat, tuple(geneRecord) )
+			else :
+				geneRecord.pop(0)
+				geneRecord.append( geneID )
+				cursor.execute( "UPDATE " + Config.DB_QUICK + ".quick_annotation SET systematic_name=%s, official_symbol=%s, aliases=%s, definition=%s, definition_length=%s, external_ids=%s, external_ids_types=%s, gene_type=%s, gene_source=%s, go_ids_combined=%s, go_names_combined=%s, go_evidence_combined=%s, go_process_ids=%s, go_process_names=%s, go_process_evidence=%s, go_component_ids=%s, go_component_names=%s, go_component_evidence=%s, go_function_ids=%s, go_function_names=%s, go_function_evidence=%s, organism_id=%s, organism_common_name=%s, organism_official_name=%s, organism_abbreviation=%s, organism_strain=%s, protein_ids=%s, protein_aliases=%s, interaction_count=%s WHERE gene_id=%s", tuple(geneRecord) )
+			
+		else :
+			cursor.execute( "INSERT INTO " + Config.DB_QUICK + ".quick_annotation VALUES (%s)" % sqlFormat, tuple(geneRecord) )
+	
+		
 		insertCount = insertCount + 1
 		
 		if 0 == (insertCount % Config.DB_COMMIT_COUNT ) :

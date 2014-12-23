@@ -4,21 +4,50 @@
 # resources into a single table.
 
 import Config
-import sys, string
+import sys, string, argparse
 import MySQLdb
 import Database
 
 from classes import Quick
 
+# Process Command Line Input
+argParser = argparse.ArgumentParser( description = 'Update all Annotation Records' )
+argGroup = argParser.add_mutually_exclusive_group( )
+argGroup.add_argument( '-o', dest='organismID', type = int, nargs = 1, help = 'An organism id to update annotation for', action='store' )
+argGroup.add_argument( '-g', dest='geneID', type = int, nargs = 1, help = 'A Gene ID to Update', action='store' )
+argGroup.add_argument( '-all', dest='allRecords', help = 'Build from All Records, Starting from Scratch', action='store_true' )
+inputArgs = vars( argParser.parse_args( ) )
+
+isOrganism = False
+isGene = False
+isAll = False
+
+if None != inputArgs['organismID'] :
+	isOrganism = True
+elif None != inputArgs['geneID'] :
+	isGene = True
+else :
+	isAll = True
+
 with Database.db as cursor :
 
 	quick = Quick.Quick( Database.db, cursor )
+	
+	if isOrganism :
+		cursor.execute( "DELETE FROM " + Config.DB_QUICK + ".quick_identifiers WHERE organism_id=%s", [inputArgs['organismID']] )
+		cursor.execute( "SELECT gene_id, systematic_name, official_symbol, aliases, definition, external_ids, external_ids_types, organism_id, organism_common_name, organism_official_name, organism_abbreviation, organism_strain, protein_aliases FROM " + Config.DB_QUICK + ".quick_annotation WHERE organism_id=%s", [inputArgs['organismID']] )
 
-	cursor.execute( "TRUNCATE TABLE " + Config.DB_QUICK + ".quick_identifiers" )
+	elif isGene :
+		cursor.execute( "DELETE FROM " + Config.DB_QUICK + ".quick_identifiers WHERE gene_id=%s", [inputArgs['geneID']] )
+		cursor.execute( "SELECT gene_id, systematic_name, official_symbol, aliases, definition, external_ids, external_ids_types, organism_id, organism_common_name, organism_official_name, organism_abbreviation, organism_strain, protein_aliases FROM " + Config.DB_QUICK + ".quick_annotation WHERE gene_id=%s", [inputArgs['geneID']] )
+		
+	else :
+		#cursor.execute( "TRUNCATE TABLE " + Config.DB_QUICK + ".quick_identifiers" )
+		#Database.db.commit( )
+		
+		cursor.execute( "SELECT gene_id, systematic_name, official_symbol, aliases, definition, external_ids, external_ids_types, organism_id, organism_common_name, organism_official_name, organism_abbreviation, organism_strain, protein_aliases FROM " + Config.DB_QUICK + ".quick_annotation" )
+	
 	Database.db.commit( )
-	
-	cursor.execute( "SELECT gene_id, systematic_name, official_symbol, aliases, definition, external_ids, external_ids_types, organism_id, organism_common_name, organism_official_name, organism_abbreviation, organism_strain, protein_aliases FROM " + Config.DB_QUICK + ".quick_annotation" )
-	
 	recordSize = 12 # Number of Columns in quick_identifiers table
 	
 	sqlFormat = ",".join( ['%s'] * recordSize )
