@@ -4,21 +4,47 @@
 # resources into a single table.
 
 import Config
-import sys, string
+import sys, string, argparse
 import MySQLdb
 import Database
 
 from classes import Quick
 
+# Process Command Line Input
+argParser = argparse.ArgumentParser( description = 'Update all Annotation Records' )
+argGroup = argParser.add_mutually_exclusive_group( )
+argGroup.add_argument( '-o', dest='organismID', type = int, nargs = 1, help = 'An organism id to update annotation for', action='store' )
+argGroup.add_argument( '-p', dest='proteinID', type = int, nargs = 1, help = 'A Protein ID to Update', action='store' )
+argGroup.add_argument( '-all', dest='allRecords', help = 'Build from All Records, Starting from Scratch', action='store_true' )
+inputArgs = vars( argParser.parse_args( ) )
+
+isOrganism = False
+isProtein = False
+isAll = False
+
+if None != inputArgs['organismID'] :
+	isOrganism = True
+elif None != inputArgs['proteinID'] :
+	isProtein = True
+else :
+	isAll = True
+
 with Database.db as cursor :
 
 	quick = Quick.Quick( Database.db, cursor )
-	orgHash = quick.fetchOrganismHash( )
-
-	cursor.execute( "TRUNCATE TABLE " + Config.DB_QUICK + ".quick_proteins" )
-	Database.db.commit( )
+	orgHash = quick.fetchProteinOrganismHash( )
 	
-	cursor.execute( "SELECT * FROM " + Config.DB_NAME + ".proteins WHERE protein_status='active' ORDER BY protein_id ASC" )
+	if isOrganism :
+		cursor.execute( "SELECT * FROM " + Config.DB_NAME + ".proteins WHERE organism_id=%s AND protein_status='active'", [inputArgs['organismID']] )
+	
+	elif isProtein :
+		cursor.execute( "SELECT * FROM " + Config.DB_NAME + ".proteins WHERE protein_id=%s AND protein_status='active'", [inputArgs['proteinID']] )
+	
+	else :
+		cursor.execute( "TRUNCATE TABLE " + Config.DB_QUICK + ".quick_proteins" )
+		Database.db.commit( )
+		
+		cursor.execute( "SELECT * FROM " + Config.DB_NAME + ".proteins WHERE protein_status='active' ORDER BY protein_id ASC" )
 	
 	proteinCount = 0
 	for row in cursor.fetchall( ) :
@@ -210,9 +236,26 @@ with Database.db as cursor :
 			proteinRecord.extend( [proteinOrder, proteinParent,"0",genes] )
 		
 		sqlFormat = ",".join( ['%s'] * len(proteinRecord) )
-		cursor.execute( "INSERT INTO " + Config.DB_QUICK + ".quick_proteins VALUES( %s )" % sqlFormat, tuple(proteinRecord) )
-
+		
+		if isProtein or isOrganism :
+			cursor.execute( "SELECT protein_id FROM " + Config.DB_QUICK + ".quick_proteins WHERE protein_id=%s LIMIT 1", [proteinID] )
+			proteinExists = cursor.fetchone( )
+			
+			if None == proteinExists :
+				cursor.execute( "INSERT INTO " + Config.DB_QUICK + ".quick_proteins VALUES( %s )" % sqlFormat, tuple(proteinRecord) )
+			else :
+				proteinRecord.pop(0)
+				proteinRecord.append( proteinID )
+				cursor.execute( "UPDATE " + Config.DB_QUICK + ".quick_proteins SET protein_identifier_value=%s, protein_isoform=%s, protein_aliases=%s, protein_externalids=%s, protein_externalids_types=%s, protein_sequence=%s, protein_sequence_length=%s, protein_name=%s, protein_description=%s, protein_source=%s, protein_version=%s, protein_curation_status=%s, protein_hasfeatures=%s, protein_hasgenes=%s, go_ids_combined=%s, go_names_combined=%s, go_evidence_combined=%s, go_process_ids=%s, go_process_names=%s, go_process_evidence=%s, go_component_ids=%s, go_component_names=%s, go_component_evidence=%s, go_function_ids=%s, go_function_names=%s, go_function_evidence=%s, organism_id=%s, organism_common_name=%s, organism_official_name=%s, organism_abbreviation=%s, organism_strain=%s, protein_ordering=%s, protein_parent=%s, interaction_count=%s, gene_ids=%s WHERE protein_id=%s", tuple(proteinRecord) )
+		else :	
+			cursor.execute( "INSERT INTO " + Config.DB_QUICK + ".quick_proteins VALUES( %s )" % sqlFormat, tuple(proteinRecord) )
+		
+		if 0 == (proteinCount % Config.DB_COMMIT_COUNT ) :
+			Database.db.commit( )
+			
 		proteinRecord = []
+	
+	Database.db.commit( )
 		
 	cursor.execute( "INSERT INTO " + Config.DB_STATS + ".update_tracker VALUES ( '0', 'QUICK_buildProteins', NOW( ) )" )
 	Database.db.commit( )

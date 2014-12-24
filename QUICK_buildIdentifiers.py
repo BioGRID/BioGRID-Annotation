@@ -42,8 +42,8 @@ with Database.db as cursor :
 		cursor.execute( "SELECT gene_id, systematic_name, official_symbol, aliases, definition, external_ids, external_ids_types, organism_id, organism_common_name, organism_official_name, organism_abbreviation, organism_strain, protein_aliases FROM " + Config.DB_QUICK + ".quick_annotation WHERE gene_id=%s", [inputArgs['geneID']] )
 		
 	else :
-		#cursor.execute( "TRUNCATE TABLE " + Config.DB_QUICK + ".quick_identifiers" )
-		#Database.db.commit( )
+		cursor.execute( "TRUNCATE TABLE " + Config.DB_QUICK + ".quick_identifiers" )
+		Database.db.commit( )
 		
 		cursor.execute( "SELECT gene_id, systematic_name, official_symbol, aliases, definition, external_ids, external_ids_types, organism_id, organism_common_name, organism_official_name, organism_abbreviation, organism_strain, protein_aliases FROM " + Config.DB_QUICK + ".quick_annotation" )
 	
