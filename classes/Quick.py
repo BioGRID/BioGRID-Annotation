@@ -23,6 +23,16 @@ class Quick( ) :
 			
 		return organismHash
 		
+	def fetchProteinOrganismHash( self ) :
+		
+		self.cursor.execute( "SELECT * FROM " + Config.DB_QUICK + ".quick_protein_organisms" )
+		
+		organismHash = { }
+		for row in self.cursor.fetchall( ) :
+			organismHash[str(row[0])] = row
+			
+		return organismHash	
+	
 	def fetchGODefinitionHash( self ) :
 	
 		self.cursor.execute( "SELECT go_id, go_name, go_type FROM " + Config.DB_NAME + ".go_definitions" )
