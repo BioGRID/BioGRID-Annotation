@@ -93,7 +93,7 @@ class EntrezGene( ) :
 				
 	def fetchExistingEntrezGeneIDs( self ) :
 		
-		self.cursor.execute( "SELECT gene_id, gene_source_id FROM " + Config.DB_NAME + ".genes WHERE gene_status='active'" )
+		self.cursor.execute( "SELECT gene_id, gene_source_id FROM " + Config.DB_NAME + ".genes WHERE gene_source='ENTREZ'" )
 		
 		idList = { }
 		for row in self.cursor.fetchall( ) :
@@ -101,9 +101,19 @@ class EntrezGene( ) :
 			
 		return idList
 		
+	def fetchEntrezGeneToOrganismMapping( self ) :
+	
+		self.cursor.execute( "SELECT organism_id, gene_source_id, gene_id FROM " + Config.DB_NAME + ".genes WHERE gene_source='ENTREZ'" )
+		
+		mapping = { }
+		for (organismID, geneSourceID, geneID) in self.cursor.fetchall( ) :
+			mapping[str(geneSourceID)] = (organismID, geneID)
+			
+		return mapping
+		
 	def fetchEntrezGeneOrganismMapping( self ) :
 	
-		self.cursor.execute( "SELECT organism_id, organism_entrez_taxid FROM " + Config.DB_NAME + ".organisms WHERE organism_status='active'" )
+		self.cursor.execute( "SELECT organism_id, entrez_taxid FROM " + Config.DB_NAME + ".organisms WHERE organism_status='active'" )
 		
 		organismList = {}
 		for row in self.cursor.fetchall( ) :
@@ -114,7 +124,7 @@ class EntrezGene( ) :
 		
 	def fetchExistingEntrezGeneIDsByOrganism( self, organismID ) :
 		
-		self.cursor.execute( "SELECT gene_id, gene_source_id FROM " + Config.DB_NAME + ".genes WHERE organism_id=%s", [organismID] )
+		self.cursor.execute( "SELECT gene_id, gene_source_id FROM " + Config.DB_NAME + ".genes WHERE organism_id=%s AND gene_source='ENTREZ'", [organismID] )
 		
 		idList = { }
 		for row in self.cursor.fetchall( ) :
