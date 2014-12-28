@@ -38,7 +38,7 @@ with Database.db as cursor :
 		# a minor pause in between, and then move on.
 		while not successful and not iteration > MAX_ITERATIONS :
 			
-			print "Processing Organism: " + organism_common_name + "(" + str(organism_id) + ")"
+			print "Processing Organism: " + organism_common_name + " (" + str(organism_id) + ")"
 			searchData["term"] = "refseq[filter] AND txid%s[organism]" % organism_taxid
 			
 			try :

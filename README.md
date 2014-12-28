@@ -30,13 +30,15 @@ To use all of the tools contained within, you require at least the following:
 ## Update Process
 
 ### Before Getting Started 
-Make sure you have a loaded copy of the annotation database tables to use for the new annotation. Load a MySQL dump of the existing CORE tables (in the SQL folder), and load it into a fresh database if starting new. Otherwise, point to a previous version of the database. Once the database is loaded, make sure you add any organisms you want added, or changed, to the organisms table, as that table will be used to fetch your set of annotation.
+Make sure you have a loaded copy of the annotation database tables to use for the new annotation. Load a MySQL dump of the existing CORE tables (in the SQL folder), and load it into a fresh database if starting new. Otherwise, point to a previous version of the database. Once the database is loaded, make sure you add any organisms you want added, or changed, to the organisms table, as that table will be used to fetch your set of annotation. This linux command: **cat gene_info | awk '{print $1}' | sort | uniq -c | sort -rn | more** is useful for building an ordered list of organisms based on number of genes in entrez gene.
 
 + Run the batch/fetchDownloads.sh file to download all the required files for an annotation update. This process will take some time, depending on the speed of your network connection. For example: the Trembl file from Uniprot is currently larger than 55 GB in XML format.
 
 + Verify that all files are downloaded
 
 + Go to config/config.json (or create this file modelled on the config.json.example file already in this directory) and adjust the settings in here to point to your setup. Especially modify the paths and the database login credentials to match your current configuration.
+
++ Run: **python EG_updateOrganisms.py** - This will change the organisms in the _genes_ table to match the current mappings in the latest Entrez Gene release.
 
 #### Prepare STAGING DATABASE
 
