@@ -17,6 +17,9 @@ with Database.db as cursor :
 	organismList = entrezGene.fetchEntrezGeneOrganismMapping( )
 	existingEntrezGeneIDs = entrezGene.fetchExistingEntrezGeneIDs( )
 
+	cursor.execute( "UPDATE " + Config.DB_NAME + ".genes SET gene_status='inactive' WHERE gene_source='ENTREZ'" )
+	Database.db.commit( )
+	
 	missingOrgs = set( )
 	
 	insertCount = 0

@@ -45,7 +45,7 @@ with Database.db as cursor :
 						cursor.execute( "INSERT INTO " + Config.DB_NAME + ".gene_externals VALUES ( '0', %s, %s, 'active', NOW( ), %s )", [dbxrefInfo[1].strip( ), dbxrefInfo[0].strip( ).upper( ), currentGeneID] )
 						
 				cursor.execute( "INSERT INTO " + Config.DB_NAME + ".gene_externals VALUES ( '0', %s, 'ENTREZ_GENE', 'active', NOW( ), %s )", [sourceID, currentGeneID] )
-				cursor.execute( "INSERT INTO " + Config.DB_NAME + ".gene_externals VALUES ( '0', %s, 'ENTREZ_GENE_ETG', 'active', NOW( ), %s )", [sourceID, 'ETG' + str(currentGeneID)] )
+				cursor.execute( "INSERT INTO " + Config.DB_NAME + ".gene_externals VALUES ( '0', %s, 'ENTREZ_GENE_ETG', 'active', NOW( ), %s )", ['ETG' + str(sourceID), currentGeneID] )
 			
 			if 0 == (insertCount % Config.DB_COMMIT_COUNT ) :
 				Database.db.commit( )
