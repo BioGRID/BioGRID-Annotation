@@ -40,13 +40,13 @@ with Database.db as cursor :
 				currentGeneID = existingEntrezGeneIDs[sourceID]
 				
 				if "-" != ensemblGeneID and ensemblGeneID.upper( ) not in ensemblHash :
-					cursor.execute( "INSERT INTO " + Config.DB_NAME + ".gene_externals VALUES( '0',%s,%s,'active',NOW( ),%s )", [ensemblGeneID.upper( ), 'ENSEMBL', currentGeneID] )
+					cursor.execute( "INSERT INTO " + Config.DB_NAME + ".gene_externals VALUES( '0',%s,%s,'active',NOW( ),%s )", [ensemblGeneID.upper( ), 'ENSEMBL GENE', currentGeneID] )
 				
 				if "-" != ensemblRNAID and ensemblRNAID.upper( ) not in ensemblHash :
-					cursor.execute( "INSERT INTO " + Config.DB_NAME + ".gene_externals VALUES( '0',%s,%s,'active',NOW( ),%s )", [ensemblRNAID.upper( ), 'ENSEMBL', currentGeneID] )
+					cursor.execute( "INSERT INTO " + Config.DB_NAME + ".gene_externals VALUES( '0',%s,%s,'active',NOW( ),%s )", [ensemblRNAID.upper( ), 'ENSEMBL RNA', currentGeneID] )
 
 				if "-" != ensemblProteinID and ensemblProteinID.upper( ) not in ensemblHash :
-					cursor.execute( "INSERT INTO " + Config.DB_NAME + ".gene_externals VALUES( '0',%s,%s,'active',NOW( ),%s )", [ensemblProteinID.upper( ), 'ENSEMBL', currentGeneID] )
+					cursor.execute( "INSERT INTO " + Config.DB_NAME + ".gene_externals VALUES( '0',%s,%s,'active',NOW( ),%s )", [ensemblProteinID.upper( ), 'ENSEMBL PROTEIN', currentGeneID] )
 				
 			if 0 == (insertCount % Config.DB_COMMIT_COUNT ) :
 				Database.db.commit( )

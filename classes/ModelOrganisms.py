@@ -55,7 +55,7 @@ class ModelOrganisms( ) :
 		
 		aliasSet = set( )
 		for row in self.cursor.fetchall( ) :
-			aliasSet.add( row[0].lower( ) )
+			aliasSet.add( row[0].strip( ).lower( ) )
 			
 		if "" != orfName and orfName.lower( ) not in aliasSet :
 			self.cursor.execute( "INSERT INTO " + Config.DB_NAME + ".gene_aliases VALUES( '0',%s, 'active', 'ordered locus', NOW( ), %s )", [orfName, geneID] )

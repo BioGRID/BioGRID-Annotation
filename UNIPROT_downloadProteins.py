@@ -25,7 +25,7 @@ MAX_ITERATIONS = 10
 
 with Database.db as cursor :
 
-	cursor.execute( "SELECT organism_id, organism_uniprot_taxid, organism_official_name, organism_strain FROM " + Config.DB_NAME + ".organisms WHERE organism_status='active'" )
+	cursor.execute( "SELECT organism_id, entrez_taxid, organism_official_name, organism_strain FROM " + Config.DB_NAME + ".organisms WHERE organism_status='active'" )
 	
 	organismList = []
 	organismHash = { }
@@ -43,7 +43,7 @@ with Database.db as cursor :
 	while len(organismList) > 0 :
 	
 		currentOrganism = organismList.pop( )
-		(organismID, organismUniprotTaxID, organismName, organismStrain) = organismHash[currentOrganism]
+		(organismID, organismTaxID, organismName, organismStrain) = organismHash[currentOrganism]
 	
 		searchData["query"] = "organism:" + currentOrganism
 		

@@ -24,13 +24,20 @@ with Database.db as cursor :
 			splitLine = line.split( "\t" )
 			sgdID = splitLine[0].strip( )
 			sgdType = splitLine[1].strip( )
+			orfName = splitLine[3].strip( )
+			
+			#if "LTR_RETROTRANSPOSON" == sgdType.upper( ) :
+				#print splitLine
 			
 			geneID = "none"
 			if sgdID not in sgdIDHash :
-				if "RETROTRANSPOSON" == sgdType.upper( ) :
+				if "LTR_RETROTRANSPOSON" == sgdType.upper( ) :
 					cursor.execute( "INSERT INTO " + Config.DB_NAME + ".genes VALUES( '0', %s, 'ordered locus', %s, 'retrotransposon', '559292', 'active', NOW( ), NOW( ), 'SGD', '0' )", [orfName, sgdID] )
 					Database.db.commit( )
 					geneID = str(cursor.lastrowid)
+					
+					cursor.execute( "INSERT INTO " + Config.DB_NAME + ".gene_externals VALUES ('0',%s,'SGD','active',NOW( ), %s)", [sgdID,geneID] )
+					Database.db.commit( )
 			else :
 			
 				# Process Addon Annotation
@@ -38,11 +45,10 @@ with Database.db as cursor :
 				
 			if geneID != "none" :
 			
-				if "RETROTRANSPOSON" == sgdType.upper( ) :
+				if "LTR_RETROTRANSPOSON" == sgdType.upper( ) :
 					cursor.execute( "UPDATE " + Config.DB_NAME + ".genes SET gene_updated = NOW( ) WHERE gene_id=%s", [geneID] )
 					Database.db.commit( )
 			
-				orfName = splitLine[3].strip( )
 				officialSymbol = splitLine[4].strip( )
 				aliases = (splitLine[5].strip( )).split( "|" )
 				additionalSGDIDs = (splitLine[7].strip( )).split( "|" )
