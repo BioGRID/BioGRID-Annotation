@@ -106,8 +106,6 @@ Make sure you have a loaded copy of the annotation database tables to use for th
 
 + Run: **python PROTEIN_mapIdenticalProteins.py** - This will check for identical sequences between the two protein databases and make a mapping if they are the same.
 
-+ Run: **python PROTEIN_buildConsolidatedSet.py** - This will update the _proteins_ table to create a consolidated UNIPROT/REFSEQ protein table. UNIPROT is considered the primary and REFSEQ is only loaded when no valid mapping to a UNIPROT exists in the previously loaded tables.
-
 ## Quick Lookup Table Generation
 Once the annotation database is completed via the steps list above, we generate several quick lookup tables that facilitate rapid searching without requiring large joins or complicated SQL queries. These tables may take some time to complete, so be prepared for a lengthy process depending on your resources available.
 
@@ -181,8 +179,6 @@ Ensure that the organism is loaded into the _organisms_ table prior to starting
 + Run: **python EG_updateGene2Uniprot.py** - This will update the mapping data from the Gene2Uniprot Collab file, into a protein mapping table.
 
 + Run: **python PROTEIN_mapIdenticalProteins.py** - This will check for identical sequences between the two protein databases and make a mapping if they are the same.
-
-+ Run: **python PROTEIN_buildConsolidatedSet.py** - This will update the _proteins_ table to create a consolidated UNIPROT/REFSEQ protein table. UNIPROT is considered the primary and REFSEQ is only loaded when no valid mapping to a UNIPROT exists in the previously loaded tables.
 
 #### Update QUICK tables
 

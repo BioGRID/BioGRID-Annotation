@@ -52,7 +52,7 @@ with Database.db as cursor :
 				
 	Database.db.commit( )
 	
-	cursor.execute( "SELECT uniprot_external_value, uniprot_id FROM " + Config.DB_NAME + ".uniprot_externals WHERE uniprot_external_source='REFSEQ'" )
+	cursor.execute( "SELECT uniprot_external_value, uniprot_id FROM " + Config.DB_NAME + ".uniprot_externals WHERE uniprot_external_source='REFSEQ-PROTEIN-ACCESSION'" )
 	
 	insertCount = 0
 	for row in cursor.fetchall( ) :

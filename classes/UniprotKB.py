@@ -111,7 +111,15 @@ class UniprotKB( ) :
 			
 			for externalType, externalSet in uniprotEntry['externals'].items( ) :
 				for external in externalSet :
-					self.cursor.execute( "INSERT INTO " + Config.DB_NAME + ".uniprot_externals VALUES( '0', %s, %s, 'active', NOW( ), %s )", [external, externalType.upper( ), uniprotID] )
+				
+					if externalType.upper( ) == "REFSEQ" :
+						accessionFull = external.strip( ).split( "." )
+						accession = accessionFull[0]
+						version = accessionFull[1]
+						self.cursor.execute( "INSERT INTO " + Config.DB_NAME + ".uniprot_externals VALUES( '0', %s, %s, 'active', NOW( ), %s )", [accession, "REFSEQ-PROTEIN-ACCESSION", uniprotID] )
+						self.cursor.execute( "INSERT INTO " + Config.DB_NAME + ".uniprot_externals VALUES( '0', %s, %s, 'active', NOW( ), %s )", [external, "REFSEQ-PROTEIN-ACCESSION-VERSIONED", uniprotID] )
+					else :
+						self.cursor.execute( "INSERT INTO " + Config.DB_NAME + ".uniprot_externals VALUES( '0', %s, %s, 'active', NOW( ), %s )", [external, externalType.upper( ), uniprotID] )
 		
 		if 'entrez_gene' in uniprotEntry :
 		

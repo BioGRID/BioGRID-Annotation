@@ -23,7 +23,7 @@ class ModelOrganisms( ) :
 		
 	def buildPombaseIDHash( self ) :
 		
-		self.cursor.execute( "SELECT gene_id, gene_alias_value FROM " + Config.DB_NAME + ".gene_aliases WHERE gene_id IN ( SELECT gene_id FROM " + Config.DB_NAME + ".genes WHERE organism_id='4896' )" )
+		self.cursor.execute( "SELECT gene_id, gene_alias_value FROM " + Config.DB_NAME + ".gene_aliases WHERE gene_id IN ( SELECT gene_id FROM " + Config.DB_NAME + ".genes WHERE organism_id='284812' )" )
 		
 		mappingHash = {}
 		for row in self.cursor.fetchall( ) :
