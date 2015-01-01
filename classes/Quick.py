@@ -23,9 +23,9 @@ class Quick( ) :
 			
 		return organismHash
 		
-	def fetchProteinOrganismHash( self ) :
+	def fetchUniprotOrganismHash( self ) :
 		
-		self.cursor.execute( "SELECT * FROM " + Config.DB_QUICK + ".quick_protein_organisms" )
+		self.cursor.execute( "SELECT * FROM " + Config.DB_QUICK + ".quick_uniprot_organisms" )
 		
 		organismHash = { }
 		for row in self.cursor.fetchall( ) :
@@ -144,6 +144,7 @@ class Quick( ) :
 		
 	def fetchExternals( self, geneID, refseqIDs ) :
 	
+		externals = set( )
 		externalIDSet = []
 		externalTypeSet = []
 		
@@ -151,14 +152,18 @@ class Quick( ) :
 			self.cursor.execute( "SELECT gene_external_value, gene_external_source FROM " + Config.DB_NAME + ".gene_externals WHERE gene_external_status='active' AND gene_id=%s", [geneID] )
 			
 			for row in self.cursor.fetchall( ) :
-				externalIDSet.append( str(row[0]) )
-				externalTypeSet.append( row[1] )
+				externals.add( str(row[0]).upper( ) + "|" + str(row[1]).upper( ) )
 				
 			refseqExternals, refseqExternalTypes = self.fetchExternalsForRefseq( refseqIDs )
 			
 			if len(refseqExternals) > 0 :
-				externalIDSet.extend(refseqExternals)
-				externalTypeSet.extend(refseqExternalTypes)
+				for refseqExternal, refseqExternalType in zip( refseqExternals, refseqExternalTypes ) :
+					externals.add( str(refseqExternal).upper( ) + "|" + str(refseqExternalType).upper( ) )
+	
+		for external in externals :
+			extSplit = external.split( "|" )
+			externalIDSet.append( extSplit[0] )
+			externalTypeSet.append( extSplit[1] )
 	
 		return externalIDSet, externalTypeSet
 		
@@ -209,40 +214,55 @@ class Quick( ) :
 		
 	def fetchUniprotNamesForGenes( self, uniprotIDs ) :
 
-		uniprotAliases = []
-		uniprotExternals = []
-		uniprotExternalTypes = []
+		uniprotAliases = set( )
+		uniprotAliasesUnique = set( )
+		uniprotExternals = set( )
+		uniprotExternalsUnique = set( )
+		uniprotExt = []
+		uniprotExtTypes = []
 		
 		if len(uniprotIDs) > 0 :
 			sqlFormat = ",".join( ['%s'] * len(uniprotIDs) )
 			self.cursor.execute( "SELECT uniprot_identifier_value, uniprot_name, uniprot_source FROM " + Config.DB_NAME + ".uniprot WHERE uniprot_id IN (%s) AND uniprot_status='active'" % sqlFormat, tuple(uniprotIDs) )
 
 			for row in self.cursor.fetchall( ) :
-				uniprotAliases.append( row[1] )
-				uniprotExternals.append( row[0] )
-				uniprotExternalTypes.append( row[2].upper( ) )
+			
+				if str(row[1]).upper( ) not in uniprotAliasesUnique :
+					uniprotAliases.add( row[1] )
+					uniprotAliasesUnique.add( row[1].upper( ) )
+				
+				if str(row[0]).upper( ) + "|" + str(row[2]).upper( ) not in uniprotExternalsUnique :
+					uniprotExternals.add( str(row[0]) + "|" + str(row[2]).upper( ) )
+					uniprotExternalsUnique.add( str(row[0]).upper( ) + "|" + str(row[2]).upper( ) )
 				
 			self.cursor.execute( "SELECT uniprot_alias_value, uniprot_alias_type FROM " + Config.DB_NAME + ".uniprot_aliases WHERE uniprot_id IN (%s) AND uniprot_alias_type != 'primary-accession' AND uniprot_alias_status='active'" % sqlFormat, tuple(uniprotIDs) )
 			
 			for row in self.cursor.fetchall( ) :
 				if 'ACCESSION' == row[1].upper( ) :
-					uniprotExternals.append( row[0] )
-					uniprotExternalTypes.append( 'UNIPROT-ACCESSION' )
+					if str(row[0]).upper( ) + "|UNIPROT-ACCESSION" not in uniprotExternalsUnique :
+						uniprotExternals.add( str(row[0]).upper( ) + "|UNIPROT-ACCESSION" )
+						uniprotExternalsUnique.add( str(row[0]).upper( ) + "|UNIPROT-ACCESSION" )
 				else :
-					uniprotAliases.append( row[0] )
+					if str(row[0]).upper( ) not in uniprotAliasesUnique :
+						uniprotAliases.add( row[0] )
+						uniprotAliasesUnique.add( row[0].upper( ) )
 					
 			self.cursor.execute( "SELECT uniprot_isoform_accession, uniprot_isoform_number FROM " + Config.DB_NAME + ".uniprot_isoforms WHERE uniprot_id IN (%s) AND uniprot_isoform_status = 'active'" % sqlFormat, tuple(uniprotIDs) )
 					
 			for row in self.cursor.fetchall( ) :
 				
-				isoform = row[0] + "-" + str(row[1])
+				isoform = row[0].upper( ) + "-" + str(row[1]) + "|UNIPROT-ISOFORM"
 				
-				if isoform not in uniprotExternals :
-				
-					uniprotExternals.append( isoform )
-					uniprotExternalTypes.append( 'UNIPROT-ISOFORM' )
+				if isoform not in uniprotExternalsUnique :
+					uniprotExternals.add( isoform )
+					uniprotAliasesUnique.add( isoform )
 					
-		return uniprotAliases, uniprotExternals, uniprotExternalTypes
+			for uniprotExtInfo in uniprotExternals :
+				extSplit = uniprotExtInfo.split( "|" )
+				uniprotExt.append(extSplit[0])
+				uniprotExtTypes.append(extSplit[1])
+					
+		return list(uniprotAliases), uniprotExt, uniprotExtTypes
 		
 	def fetchDescription( self, geneID, refseqIDs ) :
 		
@@ -336,30 +356,35 @@ class Quick( ) :
 		
 	def fetchUniprotExternals( self, uniprotID, refseqIDs ) :
 	
-		externalIDSet = []
-		externalTypeSet = []
-		geneIDs = []
+		externals = set( )
+		entrezGeneIDs = set( )
 		
-		self.cursor.execute( "SELECT uniprot_external_value, uniprot_external_source FROM " + Config.DB_NAME + ".uniprot_externals WHERE uniprot_id=%s AND uniprot_external_source != 'REFSEQ' AND uniprot_external_status='active'", [uniprotID] )
+		self.cursor.execute( "SELECT uniprot_external_value, uniprot_external_source FROM " + Config.DB_NAME + ".uniprot_externals WHERE uniprot_id=%s AND uniprot_external_status='active'", [uniprotID] )
 		
 		for row in self.cursor.fetchall( ) :
 		
 			value = str(row[0]).upper( ).replace( "HGNC:", "" ).replace( "MGI:", "" ).replace( "RGD:", "" )
 		
-			externalIDSet.append( value )
-			externalTypeSet.append( row[1] )
+			externals.add( str(value) + "|" + str(row[1]) )
 			
 			if "ENTREZ_GENE" == row[1].upper( ) :
-				geneIDs.append( str(row[0]) )
+				entrezGeneIDs.add( str(row[0]) )
 			
 		if len(refseqIDs) > 0 :
 			refseqExternals, refseqExternalTypes = self.fetchExternalsForRefseq( refseqIDs )
 				
-			if len(refseqExternals) > 0 :
-				externalIDSet.extend(refseqExternals)
-				externalTypeSet.extend(refseqExternalTypes)
+			for refseqExternal, refseqExternalType in zip(refseqExternals,refseqExternalTypes) :
+				externals.add( str(refseqExternal) + "|" + str(refseqExternalType) )
 				
-		return externalIDSet, externalTypeSet, geneIDs
+		externalIDSet = []
+		externalTypeSet = []
+		
+		for external in externals :
+			splitExternal = external.split( "|" )
+			externalIDSet.append( splitExternal[0] )
+			externalTypeSet.append( splitExternal[1] )
+				
+		return externalIDSet, externalTypeSet, entrezGeneIDs
 		
 	def fetchRefseqIDsByUniprotID( self, uniprotID ) :
 	
@@ -384,17 +409,17 @@ class Quick( ) :
 				
 		return geneIDs
 		
-	def fetchGeneIDByRefseqID( self, refseqID ) :
+	def fetchGeneIDByRefseqIDs( self, refseqIDs ) :
 	
 		geneIDs = set( )
-		if len(refseqID) > 0 :
-			self.cursor.execute( "SELECT gene_id FROM " + Config.DB_NAME + ".gene_refseqs WHERE refseq_id=%s AND gene_refseq_status='active' LIMIT 1", [refseqID] )
+		if len(refseqIDs) > 0 :
+			sqlFormat = ",".join( ['%s'] * len(refseqIDs) )
+			self.cursor.execute( "SELECT gene_id FROM " + Config.DB_NAME + ".gene_refseqs WHERE refseq_id IN (%s) AND gene_refseq_status='active'" % sqlFormat, tuple(refseqIDs) )
 			
-			row = self.cursor.fetchone( )
-			if None != row :
-				return str(row[0])
+			for row in self.cursor.fetchall( ) :
+				geneIDs.add( str(row[0]) )
 				
-		return False
+		return geneIDs
 		
 	def hasFeatures( self, uniprotID ) :
 		
@@ -450,26 +475,6 @@ class Quick( ) :
 			
 		return row[0]
 		
-	def fetchUniprotIsoformParent( self, uniprotID ) :
-		
-		self.cursor.execute( "SELECT protein_id FROM " + Config.DB_NAME + ".proteins WHERE protein_reference_id=%s and protein_source='UNIPROT'", [uniprotID] )
-		row = self.cursor.fetchone( )
-		
-		if None == row :
-			return "0"
-		
-		return row[0]
-		
-	def fetchProteinIDByUniprotID( self, uniprotID ) :
-		
-		self.cursor.execute( "SELECT protein_id FROM " + Config.DB_NAME + ".proteins WHERE protein_reference_id=%s AND protein_source = 'UNIPROT' AND protein_status='active'", [uniprotID] )
-		row = self.cursor.fetchone( )
-		
-		if None == row :
-			return False
-			
-		return row[0]
-		
 	def fetchValidGeneIDHash( self ) :
 	
 		self.cursor.execute( "SELECT gene_id FROM " + Config.DB_QUICK + ".quick_annotation" )
@@ -480,9 +485,9 @@ class Quick( ) :
 			
 		return geneHash
 		
-	def fetchValidProteinIDHash( self ) :
+	def fetchValidUniprotIDHash( self ) :
 	
-		self.cursor.execute( "SELECT protein_id FROM " + Config.DB_QUICK + ".quick_proteins" )
+		self.cursor.execute( "SELECT uniprot_id FROM " + Config.DB_QUICK + ".quick_uniprot" )
 		
 		proteinHash = set( )
 		for row in self.cursor.fetchall( ) :
