@@ -41,7 +41,8 @@ with Database.db as cursor :
 				if "-" != splitLine[5].strip( ) :
 					insertCount = insertCount + 1
 					for dbxref in dbxrefs :
-						dbxrefInfo = dbxref.split( ":" )
+						dbxrefInfo = dbxref.split( ":", 1 )
+						dbxrefInfo[1] = str(dbxrefInfo[1]).upper( ).replace( "HGNC:", "" ).replace( "MGI:", "" ).replace( "RGD:", "" )
 						cursor.execute( "INSERT INTO " + Config.DB_NAME + ".gene_externals VALUES ( '0', %s, %s, 'active', NOW( ), %s )", [dbxrefInfo[1].strip( ), dbxrefInfo[0].strip( ).upper( ), currentGeneID] )
 						
 				cursor.execute( "INSERT INTO " + Config.DB_NAME + ".gene_externals VALUES ( '0', %s, 'ENTREZ_GENE', 'active', NOW( ), %s )", [sourceID, currentGeneID] )

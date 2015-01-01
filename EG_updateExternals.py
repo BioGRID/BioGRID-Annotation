@@ -43,18 +43,19 @@ with Database.db as cursor :
 			if sourceID in existingEntrezGeneIDs :
 				
 				currentGeneID = existingEntrezGeneIDs[sourceID]
-				cursor.execute( "UPDATE " + Config.DB_NAME + ".gene_externals SET gene_external_status='inactive' WHERE gene_id=%s AND gene_external_source != 'GRID LEGACY'", [currentGeneID] )
+				cursor.execute( "UPDATE " + Config.DB_NAME + ".gene_externals SET gene_external_status='inactive' WHERE gene_id=%s AND gene_external_source NOT IN ('GRID LEGACY', 'REFSEQ_LEGACY', 'ENSEMBL RNA', 'ENSEMBL PROTEIN', 'ENSEMBL GENE')", [currentGeneID] )
 								
 				if "-" == splitLine[5].strip( ) :
 					dbxrefs = []
 					
-				dbxrefs.append( "ENTREZ_GENE:" + str(currentGeneID) )
-				dbxrefs.append( "ENTREZ_GENE_ETG:ETG" + str(currentGeneID) )
+				dbxrefs.append( "ENTREZ_GENE:" + str(sourceID) )
+				dbxrefs.append( "ENTREZ_GENE_ETG:ETG" + str(sourceID) )
 				
 				insertCount = insertCount + 1
 				for dbxref in dbxrefs :
-					dbxrefInfo = dbxref.split( ":" )
-						
+					dbxrefInfo = dbxref.split( ":", 1 )
+					dbxrefInfo[1] = str(dbxrefInfo[1]).upper( ).replace( "HGNC:", "" ).replace( "MGI:", "" ).replace( "RGD:", "" )
+					
 					cursor.execute( "SELECT gene_external_id FROM " + Config.DB_NAME + ".gene_externals WHERE gene_external_value=%s AND gene_external_source=%s AND gene_id=%s LIMIT 1", [dbxrefInfo[1].strip( ), dbxrefInfo[0].strip( ).upper( ), currentGeneID] )
 					row = cursor.fetchone( )
 						

@@ -44,7 +44,7 @@ with Database.db as cursor :
 		cursor.execute( "TRUNCATE TABLE " + Config.DB_QUICK + ".quick_annotation" )
 		Database.db.commit( )
 		
-		cursor.execute( "SELECT * FROM " + Config.DB_NAME + ".genes WHERE gene_status='active'" )
+		cursor.execute( "SELECT * FROM " + Config.DB_NAME + ".genes WHERE gene_status='active' ORDER BY gene_id ASC" )
 	
 	insertCount = 0
 	for row in cursor.fetchall( ) :
@@ -55,8 +55,20 @@ with Database.db as cursor :
 		geneRecord.append( geneID )
 		
 		officialSymbol = str(row[1]).strip( )
+		
+		# Build | delimited set of Refseq IDs
 		refseqIDs = quick.fetchRefseqIDs( geneID )
+		
+		refseq = "-"
+		if len(refseqIDs) > 0 :
+			refseq = "|".join(refseqIDs)
+		
+		# Build | delimited Set of Uniprot IDs
 		uniprotIDs = quick.fetchUniprotIDs( refseqIDs )
+		
+		uniprot = "-"
+		if len(uniprotIDs) > 0 :
+			uniprot = "|".join(uniprotIDs)
 		
 		# Grab all aliases and a systematic name (if applicable)
 		systematicName, aliases = quick.fetchAliases( geneID, officialSymbol )
@@ -120,14 +132,17 @@ with Database.db as cursor :
 		geneRecord.extend( [goFunction["IDS"], goFunction["NAMES"], goFunction["EVIDENCE"]] )
 		
 		# Get organism info out of the hash
-		(orgID, orgEntrezID, orgUniprotID, orgName, orgOfficial, orgAbbr, orgStrain) = orgHash[str(row[5])]
+		(orgID, orgTaxID, orgName, orgOfficial, orgAbbr, orgStrain) = orgHash[str(row[5])]
 		geneRecord.extend( [str(orgID), orgName, orgOfficial, orgAbbr, orgStrain] )
 		
-		# Protein IDs - Empty for Now, Filled in Later
-		geneRecord.append( "-" )
+		# Uniprot IDs
+		geneRecord.append( uniprot )
 		
-		# Protein Aliases 
+		# Uniprot Aliases 
 		geneRecord.append( uniprotAliases )
+		
+		# Refseq IDs
+		geneRecord.append( refseq )
 		
 		# Interaction Count
 		geneRecord.append( "0" )

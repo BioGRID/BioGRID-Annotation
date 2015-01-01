@@ -35,17 +35,17 @@ with Database.db as cursor :
 	
 	if isOrganism :
 		cursor.execute( "DELETE FROM " + Config.DB_QUICK + ".quick_identifiers WHERE organism_id=%s", [inputArgs['organismID']] )
-		cursor.execute( "SELECT gene_id, systematic_name, official_symbol, aliases, definition, external_ids, external_ids_types, organism_id, organism_common_name, organism_official_name, organism_abbreviation, organism_strain, protein_aliases FROM " + Config.DB_QUICK + ".quick_annotation WHERE organism_id=%s", [inputArgs['organismID']] )
+		cursor.execute( "SELECT gene_id, systematic_name, official_symbol, aliases, definition, external_ids, external_ids_types, organism_id, organism_common_name, organism_official_name, organism_abbreviation, organism_strain, uniprot_aliases FROM " + Config.DB_QUICK + ".quick_annotation WHERE organism_id=%s", [inputArgs['organismID']] )
 
 	elif isGene :
 		cursor.execute( "DELETE FROM " + Config.DB_QUICK + ".quick_identifiers WHERE gene_id=%s", [inputArgs['geneID']] )
-		cursor.execute( "SELECT gene_id, systematic_name, official_symbol, aliases, definition, external_ids, external_ids_types, organism_id, organism_common_name, organism_official_name, organism_abbreviation, organism_strain, protein_aliases FROM " + Config.DB_QUICK + ".quick_annotation WHERE gene_id=%s", [inputArgs['geneID']] )
+		cursor.execute( "SELECT gene_id, systematic_name, official_symbol, aliases, definition, external_ids, external_ids_types, organism_id, organism_common_name, organism_official_name, organism_abbreviation, organism_strain, uniprot_aliases FROM " + Config.DB_QUICK + ".quick_annotation WHERE gene_id=%s", [inputArgs['geneID']] )
 		
 	else :
 		cursor.execute( "TRUNCATE TABLE " + Config.DB_QUICK + ".quick_identifiers" )
 		Database.db.commit( )
 		
-		cursor.execute( "SELECT gene_id, systematic_name, official_symbol, aliases, definition, external_ids, external_ids_types, organism_id, organism_common_name, organism_official_name, organism_abbreviation, organism_strain, protein_aliases FROM " + Config.DB_QUICK + ".quick_annotation" )
+		cursor.execute( "SELECT gene_id, systematic_name, official_symbol, aliases, definition, external_ids, external_ids_types, organism_id, organism_common_name, organism_official_name, organism_abbreviation, organism_strain, uniprot_aliases FROM " + Config.DB_QUICK + ".quick_annotation ORDER BY gene_id ASC" )
 	
 	Database.db.commit( )
 	recordSize = 12 # Number of Columns in quick_identifiers table
