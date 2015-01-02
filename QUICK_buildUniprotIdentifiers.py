@@ -35,23 +35,23 @@ with Database.db as cursor :
 	quick = Quick.Quick( Database.db, cursor )
 	
 	if isOrganism :
-		cursor.execute( "DELETE FROM " + Config.DB_QUICK + ".quick_protein_identifiers WHERE organism_id=%s", [inputArgs['organismID']] )
-		cursor.execute( "SELECT protein_id, protein_identifier_value, protein_isoform, protein_name, protein_description, protein_source, protein_version, organism_id, organism_common_name, organism_official_name, organism_abbreviation, organism_strain, interaction_count, protein_aliases, protein_externalids, protein_externalids_types FROM " + Config.DB_QUICK + ".quick_proteins WHERE organism_id=%s", [inputArgs['organismID']] )
+		cursor.execute( "DELETE FROM " + Config.DB_QUICK + ".quick_uniprot_identifiers WHERE organism_id=%s", [inputArgs['organismID']] )
+		cursor.execute( "SELECT uniprot_id, uniprot_identifier_value, uniprot_isoform, uniprot_name, uniprot_description, uniprot_source, uniprot_version, organism_id, organism_common_name, organism_official_name, organism_abbreviation, organism_strain, interaction_count, uniprot_aliases, uniprot_externalids, uniprot_externalids_types FROM " + Config.DB_QUICK + ".quick_uniprot WHERE organism_id=%s", [inputArgs['organismID']] )
 
 	elif isProtein :
-		cursor.execute( "DELETE FROM " + Config.DB_QUICK + ".quick_protein_identifiers WHERE protein_id=%s", [inputArgs['proteinID']] )
-		cursor.execute( "SELECT protein_id, protein_identifier_value, protein_isoform, protein_name, protein_description, protein_source, protein_version, organism_id, organism_common_name, organism_official_name, organism_abbreviation, organism_strain, interaction_count, protein_aliases, protein_externalids, protein_externalids_types FROM " + Config.DB_QUICK + ".quick_proteins WHERE protein_id=%s", [inputArgs['proteinID']] )
+		cursor.execute( "DELETE FROM " + Config.DB_QUICK + ".quick_uniprot WHERE uniprot_id=%s", [inputArgs['proteinID']] )
+		cursor.execute( "SELECT uniprot_id, uniprot_identifier_value, uniprot_isoform, uniprot_name, uniprot_description, uniprot_source, uniprot_version, organism_id, organism_common_name, organism_official_name, organism_abbreviation, organism_strain, interaction_count, uniprot_aliases, uniprot_externalids, uniprot_externalids_types FROM " + Config.DB_QUICK + ".quick_uniprot WHERE uniprot_id=%s", [inputArgs['proteinID']] )
 		
 	else :
-		cursor.execute( "TRUNCATE TABLE " + Config.DB_QUICK + ".quick_protein_identifiers" )
+		cursor.execute( "TRUNCATE TABLE " + Config.DB_QUICK + ".quick_uniprot_identifiers" )
 		Database.db.commit( )
 
-		cursor.execute( "SELECT protein_id, protein_identifier_value, protein_isoform, protein_name, protein_description, protein_source, protein_version, organism_id, organism_common_name, organism_official_name, organism_abbreviation, organism_strain, interaction_count, protein_aliases, protein_externalids, protein_externalids_types FROM " + Config.DB_QUICK + ".quick_proteins" )
+		cursor.execute( "SELECT uniprot_id, uniprot_identifier_value, uniprot_isoform, uniprot_name, uniprot_description, uniprot_source, uniprot_version, organism_id, organism_common_name, organism_official_name, organism_abbreviation, organism_strain, interaction_count, uniprot_aliases, uniprot_externalids, uniprot_externalids_types FROM " + Config.DB_QUICK + ".quick_uniprot ORDER BY uniprot_id ASC" )
 	
 	recordSize = 15 # Number of Columns in quick_protein_identifiers table
 	
 	sqlFormat = ",".join( ['%s'] * recordSize )
-	query = "INSERT INTO " + Config.DB_QUICK + ".quick_protein_identifiers VALUES (%s)" % sqlFormat
+	query = "INSERT INTO " + Config.DB_QUICK + ".quick_uniprot_identifiers VALUES (%s)" % sqlFormat
 	
 	insertCount = 0
 	for row in cursor.fetchall( ) :

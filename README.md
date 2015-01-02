@@ -121,11 +121,17 @@ Once the annotation database is completed via the steps list above, we generate 
 
 + Run: **python QUICK_buildIdentifiers.py -all** - This will generate a quick lookup table of gene identifiers. The table containing this data is simply named _quick_identifiers_ due to legacy purposes.
 
-+ Run: **python QUICK_buildProteins.py -all** - This will generate a quick lookup table of proteins.
++ Run: **python QUICK_buildUniprot.py -all** - This will generate a quick lookup table of proteins.
 
-+ Run: **python QUICK_buildProteinIdentifiers.py -all** - This will generate a quick lookup table of protein identifiers.
++ Run: **python QUICK_buildUniprotIsoforms.py -all** - This will append uniprot isoforms onto the uniprot table.
 
-+ Run: **python QUICK_buildProteinFeatures.py** - This will generate a quick lookup table of protein features.
++ Run: **python QUICK_buildUniprotIdentifiers.py -all** - This will generate a quick lookup table of protein identifiers.
+
++ Run: **python QUICK_buildUniprotFeatures.py** - This will generate a quick lookup table of protein features.
+
++ Run: **python QUICK_buildRefseq.py -all** - This will generate a quick lookup table of refseq proteins.
+
++ Run: **python QUICK_buildRefseqIdentifiers.py -all** - This will generate a quick lookup table of refseq protein identifiers.
 
 ## Testing
 These calls are mostly for internal BioGRID based testing to validate the final resulting annotation before rolling it out to various different applications within our ecosystem. Likely not of much use to third parties.
@@ -188,8 +194,14 @@ Ensure that the organism is loaded into the _organisms_ table prior to starting
 
 + Run: **python QUICK_buildIdentifiers.py -o [BIOGRID ORGANISM ID]** - This will append or update the identifiers for this organism in the _quick_identifiers_ table. 
 
-+ Run: **python QUICK_buildProteins.py -o [BIOGRID ORGANISM ID]** - This will append or update the proteins for this organism in the _quick_proteins_ table. 
++ Run: **python QUICK_buildUniprot.py -o [BIOGRID ORGANISM ID]** - This will append or update the proteins for this organism in the _quick_proteins_ table.
 
-+ Run: **python QUICK_buildProteinIdentifiers.py -o [BIOGRID ORGANISM ID]** - This will append or update the protein identifiers for this organism in the _quick_protein_identifiers_ table. 
++ Run: **python QUICK_buildUniprotIsoforms.py -o [BIOGRID ORGANISM ID]** - This will append uniprot isoforms onto the uniprot table. 
 
-+ Run: **python QUICK_buildProteinFeatures.py** - This will generate a quick lookup table of protein features.
++ Run: **python QUICK_buildUniprotIdentifiers.py -o [BIOGRID ORGANISM ID]** - This will append or update the protein identifiers for this organism in the _quick_protein_identifiers_ table. 
+
++ Run: **python QUICK_buildUniprotFeatures.py** - This will generate a quick lookup table of protein features.
+
++ Run: **python QUICK_buildRefseq.py -o [BIOGRID ORGANISM ID]** - This will generate a quick lookup table of refseq proteins.
+
++ Run: **python QUICK_buildRefseqIdentifiers.py -o [BIOGRID ORGANISM ID]** - This will generate a quick lookup table of refseq protein identifiers.

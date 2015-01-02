@@ -18,6 +18,8 @@ argGroup.add_argument( '-u', dest='uniprotID', type = int, nargs = 1, help = 'A 
 argGroup.add_argument( '-all', dest='allRecords', help = 'Build from All Records, Starting from Scratch', action='store_true' )
 inputArgs = vars( argParser.parse_args( ) )
 
+idAppend = 100000000
+
 isOrganism = False
 isUniprot = False
 isAll = False
@@ -35,16 +37,13 @@ with Database.db as cursor :
 	orgHash = quick.fetchUniprotOrganismHash( )
 	
 	if isOrganism :
-		cursor.execute( "SELECT * FROM " + Config.DB_NAME + ".uniprot WHERE organism_id=%s AND uniprot_status='active'", [inputArgs['organismID']] )
+		cursor.execute( "SELECT * FROM " + Config.DB_NAME + ".uniprot_isoforms WHERE organism_id=%s AND uniprot_isoform_status='active'", [inputArgs['organismID']] )
 	
 	elif isUniprot :
-		cursor.execute( "SELECT * FROM " + Config.DB_NAME + ".uniprot WHERE uniprot_id=%s AND uniprot_status='active'", [inputArgs['proteinID']] )
+		cursor.execute( "SELECT * FROM " + Config.DB_NAME + ".uniprot_isoforms WHERE uniprot_isoform_id=%s AND uniprot_isoform_status='active'", [inputArgs['proteinID']] )
 	
 	else :
-		cursor.execute( "TRUNCATE TABLE " + Config.DB_QUICK + ".quick_uniprot" )
-		Database.db.commit( )
-		
-		cursor.execute( "SELECT * FROM " + Config.DB_NAME + ".uniprot WHERE uniprot_status='active' ORDER BY uniprot_id ASC" )
+		cursor.execute( "SELECT * FROM " + Config.DB_NAME + ".uniprot_isoforms WHERE uniprot_isoform_status='active' ORDER BY uniprot_isoform_id ASC" )
 	
 	proteinCount = 0
 	for row in cursor.fetchall( ) :
@@ -53,8 +52,8 @@ with Database.db as cursor :
 		print "Working on: " + str(proteinCount)
 	
 		proteinRecord = []
-		proteinID = str(row[0])
-		proteinType = "UNIPROT"
+		proteinID = str(idAppend + row[0])
+		proteinType = "UNIPROT-ISOFORM"
 		
 		proteinRecord.append( proteinID )
 		proteinDetails = row
@@ -78,40 +77,37 @@ with Database.db as cursor :
 		
 		if proteinDetails :
 		
-			organismIndex = 11
+			organismIndex = 9
 			
-			officialSymbol = proteinDetails[1]
-			
+			officialSymbol = proteinDetails[1] + "-" + str(proteinDetails[2])
+			proteinParent = str(proteinDetails[10])
+			proteinOrder = proteinDetails[2]
+		
 			# Fetch REFSEQ IDs, ENTREZ GENE IDs, and EXTERNAL REFERENCES for the Uniprot Protein
-			refseqIDs = quick.fetchRefseqIDsByUniprotID( proteinID )
-			externalIDs, externalTypes, entrezGeneIDs = quick.fetchUniprotExternals( proteinID, refseqIDs )
-			
+			refseqIDs = quick.fetchRefseqIDsByUniprotID( str(proteinDetails[10]) )
+			externalIDs, externalTypes, entrezGeneIDs = quick.fetchUniprotExternals( str(proteinDetails[10]), refseqIDs )
+
 			# Get actual GENE IDs for the Entrez Gene IDs
 			geneIDs = quick.fetchGeneIDsByEntrezGeneIDs( entrezGeneIDs )
-			refGeneIDs = quick.fetchGeneIDByRefseqIDs( refseqIDs )
-			
-			geneIDs = geneIDs.union(refGeneIDs)
-			
+
 			if len(geneIDs) > 0 :
 				genes = "|".join(sorted(geneIDs, key=int))
 				
 			if len(refseqIDs) > 0 :
 				refseqs = "|".join(sorted(refseqIDs, key=int))
-			
+
 			# Aliases
-			aliases = quick.fetchUniprotAliases( proteinID, geneIDs, proteinDetails[1] )
+			aliases = quick.fetchUniprotAliases( str(proteinDetails[10]), geneIDs, proteinDetails[1] )
 			
 			# Sequence, Sequence Length, Name, Description, Source, Version, Curation Status
-			proteinMiddle = [proteinDetails[2], proteinDetails[3], proteinDetails[4], proteinDetails[5], proteinDetails[6], proteinDetails[7], proteinDetails[8]]
+			proteinMiddle = [proteinDetails[3], proteinDetails[4], proteinDetails[5], proteinDetails[6], 'UNIPROT-ISOFORM', '1', 'Isoform']
+			hasFeatures = "false"
 			
-			if quick.hasFeatures( proteinID ) :
-				hasFeatures = "true"
-				
 			# Fetch GENE ONTOLOGY
-			goProcess, goComponent, goFunction = quick.fetchGO( proteinID, "UNIPROT" )
+			goProcess, goComponent, goFunction = quick.fetchGO( str(proteinDetails[10]), "UNIPROT" )
 			
 			# Primary Identifier and Isoform Number
-			proteinRecord.extend( [officialSymbol,'1'] )
+			proteinRecord.extend( [officialSymbol, str(proteinDetails[2])] )
 			
 			# Aliases
 			if len( aliases ) <= 0 :
@@ -192,7 +188,7 @@ with Database.db as cursor :
 	
 	Database.db.commit( )
 		
-	cursor.execute( "INSERT INTO " + Config.DB_STATS + ".update_tracker VALUES ( '0', 'QUICK_buildUniprot', NOW( ) )" )
+	cursor.execute( "INSERT INTO " + Config.DB_STATS + ".update_tracker VALUES ( '0', 'QUICK_buildUniprotIsoforms', NOW( ) )" )
 	Database.db.commit( )
 	
 sys.exit( )
