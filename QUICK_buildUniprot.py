@@ -38,7 +38,7 @@ with Database.db as cursor :
 		cursor.execute( "SELECT * FROM " + Config.DB_NAME + ".uniprot WHERE organism_id=%s AND uniprot_status='active'", [inputArgs['organismID']] )
 	
 	elif isUniprot :
-		cursor.execute( "SELECT * FROM " + Config.DB_NAME + ".uniprot WHERE uniprot_id=%s AND uniprot_status='active'", [inputArgs['proteinID']] )
+		cursor.execute( "SELECT * FROM " + Config.DB_NAME + ".uniprot WHERE uniprot_id=%s AND uniprot_status='active'", [inputArgs['uniprotID']] )
 	
 	else :
 		cursor.execute( "TRUNCATE TABLE " + Config.DB_QUICK + ".quick_uniprot" )
