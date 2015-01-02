@@ -32,6 +32,16 @@ class Quick( ) :
 			organismHash[str(row[0])] = row
 			
 		return organismHash	
+
+	def fetchRefseqOrganismHash( self ) :
+		
+		self.cursor.execute( "SELECT * FROM " + Config.DB_QUICK + ".quick_refseq_organisms" )
+		
+		organismHash = { }
+		for row in self.cursor.fetchall( ) :
+			organismHash[str(row[0])] = row
+			
+		return organismHash	
 	
 	def fetchGODefinitionHash( self ) :
 	
@@ -421,6 +431,18 @@ class Quick( ) :
 				
 		return geneIDs
 		
+	def fetchGeneIDByRefseqID( self, refseqID ) :
+	
+		geneIDs = set( )
+		if len(refseqID) > 0 :
+			self.cursor.execute( "SELECT gene_id FROM " + Config.DB_NAME + ".gene_refseqs WHERE refseq_id = %s AND gene_refseq_status='active' LIMIT 1", [refseqID] )
+			row = self.cursor.fetchone( )
+			
+			if None == row :
+				return "0"
+				
+		return row[0]
+		
 	def hasFeatures( self, uniprotID ) :
 		
 		self.cursor.execute( "SELECT uniprot_feature_id FROM " + Config.DB_NAME + ".uniprot_features WHERE uniprot_id=%s AND uniprot_feature_status='active' LIMIT 1", [uniprotID] )
@@ -494,3 +516,13 @@ class Quick( ) :
 			proteinHash.add( str(row[0]) )
 			
 		return proteinHash
+		
+	def fetchQuickAnnotation( self, geneID ) :
+	
+		self.cursor.execute( "SELECT * FROM " + Config.DB_QUICK + ".quick_annotation WHERE gene_id=%s", [geneID] )
+		row = self.cursor.fetchone( )
+		
+		if None == row :
+			return False
+			
+		return row
