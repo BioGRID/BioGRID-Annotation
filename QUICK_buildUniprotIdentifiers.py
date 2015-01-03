@@ -39,7 +39,7 @@ with Database.db as cursor :
 		cursor.execute( "SELECT uniprot_id, uniprot_identifier_value, uniprot_isoform, uniprot_name, uniprot_description, uniprot_source, uniprot_version, organism_id, organism_common_name, organism_official_name, organism_abbreviation, organism_strain, interaction_count, uniprot_aliases, uniprot_externalids, uniprot_externalids_types FROM " + Config.DB_QUICK + ".quick_uniprot WHERE organism_id=%s", [inputArgs['organismID']] )
 
 	elif isProtein :
-		cursor.execute( "DELETE FROM " + Config.DB_QUICK + ".quick_uniprot WHERE uniprot_id=%s", [inputArgs['proteinID']] )
+		cursor.execute( "DELETE FROM " + Config.DB_QUICK + ".quick_uniprot_identifiers WHERE uniprot_id=%s", [inputArgs['proteinID']] )
 		cursor.execute( "SELECT uniprot_id, uniprot_identifier_value, uniprot_isoform, uniprot_name, uniprot_description, uniprot_source, uniprot_version, organism_id, organism_common_name, organism_official_name, organism_abbreviation, organism_strain, interaction_count, uniprot_aliases, uniprot_externalids, uniprot_externalids_types FROM " + Config.DB_QUICK + ".quick_uniprot WHERE uniprot_id=%s", [inputArgs['proteinID']] )
 		
 	else :
@@ -59,7 +59,7 @@ with Database.db as cursor :
 		record = [row[0]] # Before ID data
 		recordBase = [row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11], row[12]] # After ID Data
 		
-		cursor.execute( query, tuple(record + [row[0], "BIOGRID_PROTEIN"] + recordBase) )
+		cursor.execute( query, tuple(record + [row[0], "BIOGRID_UNIPROT_ID"] + recordBase) )
 		
 		if "-" != row[1] :
 			cursor.execute( query, tuple(record + [row[1], "PRIMARY ACCESSION"] + recordBase) )
