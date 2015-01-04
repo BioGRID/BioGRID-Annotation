@@ -517,6 +517,16 @@ class Quick( ) :
 			
 		return proteinHash
 		
+	def fetchValidRefseqIDHash( self ) :
+	
+		self.cursor.execute( "SELECT refseq_id FROM " + Config.DB_QUICK + ".quick_refseq" )
+		
+		proteinHash = set( )
+		for row in self.cursor.fetchall( ) :
+			proteinHash.add( str(row[0]) )
+			
+		return proteinHash
+		
 	def fetchQuickAnnotation( self, geneID ) :
 	
 		self.cursor.execute( "SELECT * FROM " + Config.DB_QUICK + ".quick_annotation WHERE gene_id=%s", [geneID] )
