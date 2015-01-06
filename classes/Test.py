@@ -10,6 +10,7 @@ class Test( ) :
 	def __init__( self, db, cursor ) :
 		self.db = db
 		self.cursor = cursor
+		self.fragmentLength = 10
 		
 	def findReplacementCandidateGenes( self, geneID, organismID ) :
 		
@@ -41,5 +42,84 @@ class Test( ) :
 			return "-"
 			
 		return row[0]
+		
+	def testPTMFragment( self, proteinID, residueLoc, oldSeq ) :
+	
+		ptmDetails = []
+	
+		# GRAB NEW SEQUENCE
+		self.cursor.execute( "SELECT refseq_id, refseq_sequence, refseq_length FROM " + Config.DB_QUICK + ".quick_refseq WHERE refseq_id=%s LIMIT 1", [proteinID] )
+		(refseqID, sequence, seqLength) = self.cursor.fetchone( )
+	
+		# CREATE FRAGMENT BOUNDARIES
+		startLoc = (residueLoc-1)-self.fragmentLength
+		if startLoc < 0 :
+			startLoc = 0
+			
+		endLoc = residueLoc+self.fragmentLength
+		if endLoc > len(oldSeq) :
+			endLoc = len(oldSeq)
+		
+		# CREATE FRAGMENTS
+		fragment = oldSeq[startLoc:endLoc]
+		fragmentFront = oldSeq[startLoc:residueLoc]
+		fragmentBack = oldSeq[residueLoc-1:endLoc]
+		
+		if fragment.upper( ) in sequence and len(fragmentFront) >= self.fragmentLength and len(fragmentBack) >= self.fragmentLength :
+			ptmSiteLoc = sequence.index( fragment.upper( ) ) + self.fragmentLength
+			ptmDetails.append( str(proteinID) )
+			ptmDetails.append( str(ptmSiteLoc+1) )
+			ptmDetails.append( sequence[ptmSiteLoc] )
+			ptmDetails.append( "FULL FRAGMENT RECOVERY" )
+		elif fragmentFront.upper( ) in sequence and len(fragmentFront) >= self.fragmentLength :
+			ptmSiteLoc = sequence.index( fragmentFront.upper( ) ) + self.fragmentLength
+			ptmDetails.append( str(proteinID) )
+			ptmDetails.append( str(ptmSiteLoc+1) )
+			ptmDetails.append( sequence[ptmSiteLoc] )
+			ptmDetails.append( "HEAD FRAGMENT RECOVERY" )
+		elif fragmentBack.upper( ) in sequence and len(fragmentBack) >= self.fragmentLength :
+			ptmSiteLoc = sequence.index( fragmentBack.upper( ) )
+			ptmDetails.append( str(proteinID) )
+			ptmDetails.append( str(ptmSiteLoc+1) )
+			ptmDetails.append( sequence[ptmSiteLoc] )
+			ptmDetails.append( "TAIL FRAGMENT RECOVERY" )
+		else :
+			ptmDetails.append( "dead" )
+			ptmDetails.append( "dead" )
+			ptmDetails.append( "dead" )
+			ptmDetails.append( "NO FRAGMENT MATCH" )
+			
+		return ptmDetails
+		
+	def isPTMValid( self, residueLoc, residue, sequence ) :
+			
+		if residueLoc > len(sequence) :
+			return False
+		elif sequence[residueLoc-1].upper( ) != residue.upper( ) :
+			return False
+			
+		return True
+		
+	def processPTM( self, ptmID ) :
+	
+		ptmDetails = []
+		ptmDetails.append( str(ptmID) )
+	
+		# GRAB PTM DETAILS
+		self.cursor.execute( "SELECT refseq_protein_id, ptm_residue_location, ptm_residue, ptm_id, modification_id, gene_id FROM " + Config.DB_IMS + ".ptms WHERE ptm_id=%s LIMIT 1", [ptmID] )
+		(proteinID, residueLoc, residue, ptmID, modID, geneID) = self.cursor.fetchone( )
+		
+		ptmDetails.append( str(proteinID) )
+		ptmDetails.append( str(residueLoc) )
+		ptmDetails.append( str(residue) )
+		
+		# GRAB OLD SEQUENCE
+		self.cursor.execute( "SELECT refseq_protein_sequence, refseq_protein_length FROM " + Config.DB_OLDQUICK + ".quick_refseq_proteins WHERE refseq_protein_id=%s LIMIT 1", [proteinID] )
+		(oldSeq, oldSeqLength) = self.cursor.fetchone( )
+		
+		fragmentDetails = self.testPTMFragment( proteinID, residueLoc, oldSeq )
+		ptmDetails.extend( fragmentDetails )
+		
+		return ptmDetails
 			
 				
