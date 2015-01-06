@@ -14,10 +14,12 @@ with Database.db as cursor :
 	quick = Quick.Quick( Database.db, cursor )
 	proteinHash = quick.fetchValidRefseqIDHash( )
 	
-	cursor.execute( "SELECT refseq_protein_id, ptm_residue_location, ptm_residue, ptm_id, modification_id, geneID FROM " + Config.DB_IMS + ".ptms WHERE ptm_status='active'" )
+	cursor.execute( "SELECT refseq_protein_id, ptm_residue_location, ptm_residue, ptm_id, modification_id, gene_id FROM " + Config.DB_IMS + ".ptms WHERE ptm_status='active'" )
 	
 	missingSEQs = set( )
 	missingPTMs = set( )
+	recoveredSEQs = set( )
+	recoveredSEQsPTMs = set( )
 	invalidPTMSites = set( )
 	lengthProblemPTMSites = set( )
 	validPTMSites = set( )
@@ -32,9 +34,21 @@ with Database.db as cursor :
 		
 			# CHECK HERE FOR ANY NEW SEQUENCES 
 			# WITH THE EXACT SAME SPOT 
-		
-			missingSEQs.add(proteinID)
-			missingPTMs.add(str(ptmID))
+			cursor.execute( "SELECT refseq_protein_sequence, refseq_protein_length FROM " + Config.DB_OLDQUICK + ".quick_refseq_proteins WHERE refseq_protein_id=%s LIMIT 1", [proteinID] )
+			(oldSeq, oldSeqLength) = cursor.fetchone( )
+			
+			cursor.execute( "SELECT refseq_id, refseq_sequence, refseq_length FROM " + Config.DB_QUICK + ".quick_refseq WHERE gene_id=%s", [geneID] )
+			
+			for (refseqID, sequence, seqLength) in cursor.fetchall( ) :
+				if oldSeq.upper( ) == sequence.upper( ) :
+					print "FOUND IDENTICAL MATCH"
+					recoveredSEQs.add(proteinID)
+					recoveredSEQsPTMs.add(str(ptmID))
+				else :
+					print "NO MATCH"
+					missingSEQs.add(proteinID)
+					missingPTMs.add(str(ptmID))
+			
 		else :
 			# Check to see if PTM is still valid with the current sequence
 			cursor.execute( "SELECT refseq_id, refseq_sequence, refseq_length FROM " + Config.DB_QUICK + ".quick_refseq WHERE refseq_id=%s LIMIT 1", [proteinID] )
@@ -58,18 +72,18 @@ with Database.db as cursor :
 				fragment = oldSeq[startLoc:endLoc]
 				fragmentFront = oldSeq[startLoc:residueLoc]
 				fragmentBack = oldSeq[residueLoc:endLoc]
-				print "SEARCHING FOR: " + fragment.upper( )
+				#print "SEARCHING FOR: " + fragment.upper( )
 				if fragment.upper( ) in sequence :
-					print "RECOVERED BY FULL FRAGMENT COMPARE"
+					#print "RECOVERED BY FULL FRAGMENT COMPARE"
 					recoveredPTMSites.add( str(ptmID) )
 				elif fragmentFront.upper( ) in sequence :
-					print "RECOVERED BY FRONT FRAGMENT COMPARE"
+					#print "RECOVERED BY FRONT FRAGMENT COMPARE"
 					recoveredPTMSites.add( str(ptmID) )
 				elif fragmentBack.upper( ) in sequence :
-					print "RECOVERED BY BACK FRAGMENT COMPARE"
+					#print "RECOVERED BY BACK FRAGMENT COMPARE"
 					recoveredPTMSites.add( str(ptmID) )
 				else :
-					print "NO FRAGMENT MATCH FOUND"
+					#print "NO FRAGMENT MATCH FOUND"
 					invalidPTMSites.add( str(ptmID) )
 				
 			else :
@@ -151,6 +165,8 @@ with Database.db as cursor :
 			
 	print "Number of Missing Sequences: " + str( len(missingSEQs) )
 	print "Number of Missing PTMs: " + str( len(missingPTMs) )
+	print "Number of Missing Sequences Recovered: " + str( len(recoveredSEQs) )
+	print "Number of Missing Sequences PTMs Recovered: " + str( len(recoveredSEQsPTMs) )
 	print "Number of Length Problem PTMs: " + str( len(lengthProblemPTMSites) )
 	print "Number of Invalid PTMs: " + str( len(invalidPTMSites) )
 	print "Number of Remapped PTMs: " + str( len(recoveredPTMSites) )
