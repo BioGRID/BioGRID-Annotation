@@ -1,5 +1,5 @@
-# Change the organism ID of existing genes before running
-# the update.
+# Change the gene_ids of existing interactions 
+# based on processed swap details.
 
 import Config
 import sys, string, argparse
