@@ -18,6 +18,7 @@ with Database.db as cursor :
 
 	disabledPTMs = set( )
 	swappedPTMs = set( )
+	duplicatePTMs = set( )
 	
 	with open( inputArgs['inputFile'], 'r' ) as file :
 		for line in file.readlines( ) :
@@ -37,13 +38,29 @@ with Database.db as cursor :
 				cursor.execute( "UPDATE " + Config.DB_IMS + ".ptms SET ptm_status='inactive' WHERE ptm_id=%s", [ptmID] )
 				disabledPTMs.add( ptmID )
 			else :
-				cursor.execute( "UPDATE " + Config.DB_IMS + ".ptms SET refseq_protein_id=%s, ptm_residue_location=%s, ptm_residue=%s WHERE ptm_id=%s", [newSeqID, newLoc, newRes, ptmID] )
-				swappedPTMs.add( ptmID )
+			
+				# GET PUBLICATION ID FROM OLD PTM
+				cursor.execute( "SELECT ptm_id, publication_id FROM " + Config.DB_IMS + ".ptms WHERE ptm_id=%s LIMIT 1", [ptmID] )
+				ptmInfo = cursor.fetchone( )
+				
+				# CHECK TO SEE IF BY SWAPPING WE WOULD CREATE A DUPLICATE
+				cursor.execute( "SELECT ptm_id FROM " + Config.DB_IMS + ".ptms WHERE refseq_protein_id=%s AND ptm_residue_location=%s AND publication_id=%s LIMIT 1", [newSeqID, newLoc, ptmInfo[1]] )
+				ptmTest = cursor.fetchone( )
+				
+				# IF NO DUPLICATE UPDATE TO NEW DETAILS
+				# IF DUPLICATE, JUST DEPRECATE IT
+				if None == ptmTest :
+					cursor.execute( "UPDATE " + Config.DB_IMS + ".ptms SET refseq_protein_id=%s, ptm_residue_location=%s, ptm_residue=%s WHERE ptm_id=%s", [newSeqID, newLoc, newRes, ptmID] )
+					swappedPTMs.add( ptmID )
+				else :
+					cursor.execute( "UPDATE " + Config.DB_IMS + ".ptms SET ptm_status='inactive' WHERE ptm_id=%s", [ptmID] )
+					duplicatePTMs.add( ptmID )
 			
 			Database.db.commit( )
 	
-	print "DISABLED : " + str(len(disabledPTMs)) + " PTMs"
-	print "SWAPPED  : " + str(len(swappedPTMs)) +  " PTMs"
+	print "DISABLED  : " + str(len(disabledPTMs)) + " PTMs"
+	print "SWAPPED   : " + str(len(swappedPTMs)) +  " PTMs"
+	print "DUPLICATE : " + str(len(duplicatePTMs)) +  " PTMs"
 	
 	Database.db.commit( )
 				
