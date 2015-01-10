@@ -37,7 +37,7 @@ with Database.db as cursor :
 			
 			for (intID, interactorA, interactorB, expSys, pubID, modID) in cursor.fetchall( ) :
 
-				if "dead" == newID :
+				if "DEAD" == newID.upper( ) :
 					# Deprecate Interactions involving this Gene
 					print "FOUND DEAD, DEPRECATING"
 					cursor.execute( "INSERT INTO " + Config.DB_IMS + ".interaction_history VALUES( '0','DISABLED', %s, '1', %s, NOW( ) )", [intID, disableMsg] )
@@ -79,7 +79,7 @@ with Database.db as cursor :
 				participantList = participants.split( "|" )
 				if str(oldID) in participantList :
 				
-					if "dead" == newID :
+					if "DEAD" == newID.upper( ) :
 						# Deprecate Complexes involving this Gene
 						print "FOUND DEAD COMPLEX, DEPRECATING"
 						cursor.execute( "INSERT INTO " + Config.DB_IMS + ".complex_history VALUES( '0','DISABLED', %s, '1', %s, NOW( ) )", [complexID, disableMsg] )
