@@ -34,8 +34,9 @@ with Database.db as cursor :
 	print "Number of Deactivated Complexes: " + str( len(deactivatedComplexes) )
 	print "Number of Deactivated Genes: " + str( len(deactivatedGenes) )
 
-	sqlFormat = ",".join( ['%s'] * len(deactivatedGenes) )
-	cursor.execute( "SELECT gene_id, organism_id, organism_common_name FROM " + Config.DB_OLDQUICK + ".quick_annotation WHERE gene_id IN (%s)" % sqlFormat, tuple(deactivatedGenes) )
+	if len(deactivatedGenes) > 0 :
+		sqlFormat = ",".join( ['%s'] * len(deactivatedGenes) )
+		cursor.execute( "SELECT gene_id, organism_id, organism_common_name FROM " + Config.DB_OLDQUICK + ".quick_annotation WHERE gene_id IN (%s)" % sqlFormat, tuple(deactivatedGenes) )
 
 	# organisms = { }
 	# for (geneID, organismID, organismCommonName) in cursor.fetchall( ) :
