@@ -92,6 +92,8 @@ Make sure you have a loaded copy of the annotation database tables to use for th
 
 + Run: **python CGD_fixAnnotation.py** - This will process the CGD file and fix some problems with the ENTREZ GENE version. Specifically, some duplicate entries and non-common place systematic names. This script will likely require modification due to regular changes to file formatting and processes at both CGD and NCBI.
 
++ Run: **python WORMBASE_parseGenes.py** - This will process the Wormbase files to fix problems with the ENTREZ GENE version. SPecifically issues with no wormbase ids being assigned.
+
 #### Process UNIPROTKB
 
 + Run: **python UNIPROT_downloadProteins.py** - This will download a file for each organism we are interested in containing both SWISS-PROT and TREMBL proteins. These will be parsed out in the subsequent steps. After completion, go to the directory where you downloaded the files and run **gzip --test --verbose *.gz**. This will test all the files to ensure they are complete (some may fail during transfer). If any show errors, simply run **python UNIPROT_downloadProteins.py -o [ORGANISM ID]** to re-download that specific file. Keep testing and re-downloading until all files pass as valid compressed files.

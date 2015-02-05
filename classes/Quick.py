@@ -296,6 +296,12 @@ class Quick( ) :
 			if 'POMBASE-DESCRIPTION' in descriptions :
 				return "; ".join(descriptions['POMBASE-DESCRIPTION'])
 				
+			if 'WORMBASE-DESCRIPTION' in descriptions :
+				return "; ".join(descriptions['WORMBASE-DESCRIPTION'])
+				
+			if 'WORMBASE-CLASS' in descriptions :
+				return "; ".join(descriptions['WORMBASE-CLASS'])
+				
 			if len(refseqIDs) > 0 :
 				sqlFormat = ",".join( ['%s'] * len(refseqIDs) )
 				self.cursor.execute( "SELECT refseq_description FROM " + Config.DB_NAME + ".refseq WHERE refseq_id IN (%s) and refseq_status='active'" % sqlFormat, tuple(refseqIDs) )

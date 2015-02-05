@@ -158,7 +158,7 @@ with Database.db as cursor :
 			else :
 				geneRecord.pop(0)
 				geneRecord.append( geneID )
-				cursor.execute( "UPDATE " + Config.DB_QUICK + ".quick_annotation SET systematic_name=%s, official_symbol=%s, aliases=%s, definition=%s, definition_length=%s, external_ids=%s, external_ids_types=%s, gene_type=%s, gene_source=%s, go_ids_combined=%s, go_names_combined=%s, go_evidence_combined=%s, go_process_ids=%s, go_process_names=%s, go_process_evidence=%s, go_component_ids=%s, go_component_names=%s, go_component_evidence=%s, go_function_ids=%s, go_function_names=%s, go_function_evidence=%s, organism_id=%s, organism_common_name=%s, organism_official_name=%s, organism_abbreviation=%s, organism_strain=%s, protein_ids=%s, protein_aliases=%s, interaction_count=%s WHERE gene_id=%s", tuple(geneRecord) )
+				cursor.execute( "UPDATE " + Config.DB_QUICK + ".quick_annotation SET systematic_name=%s, official_symbol=%s, aliases=%s, definition=%s, definition_length=%s, external_ids=%s, external_ids_types=%s, gene_type=%s, gene_source=%s, go_ids_combined=%s, go_names_combined=%s, go_evidence_combined=%s, go_process_ids=%s, go_process_names=%s, go_process_evidence=%s, go_component_ids=%s, go_component_names=%s, go_component_evidence=%s, go_function_ids=%s, go_function_names=%s, go_function_evidence=%s, organism_id=%s, organism_common_name=%s, organism_official_name=%s, organism_abbreviation=%s, organism_strain=%s, uniprot_ids=%s, uniprot_aliases=%s, refseq_ids=%s, interaction_count=%s WHERE gene_id=%s", tuple(geneRecord) )
 			
 		else :
 			cursor.execute( "INSERT INTO " + Config.DB_QUICK + ".quick_annotation VALUES (%s)" % sqlFormat, tuple(geneRecord) )

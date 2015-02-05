@@ -29,3 +29,7 @@ wget -m -nd ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledg
 
 cd ../pombase
 wget -m -nd ftp://ftp.ebi.ac.uk/pub/databases/pombase/pombe/Mappings/sysID2product.tsv
+
+cd ../wormbase
+wget -m -nd ftp://ftp.wormbase.org/pub/wormbase/releases/WS246/species/c_elegans/PRJNA13758/annotation/c_elegans.PRJNA13758.WS246.functional_descriptions.txt.gz
+wget -m -nd ftp://ftp.wormbase.org/pub/wormbase/releases/WS246/species/c_elegans/PRJNA13758/annotation/c_elegans.PRJNA13758.WS246.geneOtherIDs.txt.gz
