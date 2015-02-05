@@ -12,7 +12,8 @@
 		"SGD_DIR"						: "sgd",
 		"PSI_DIR"						: "psi",
 		"GO_DIR"						: "go",
-		"POMBASE_DIR"					: "pombase"
+		"POMBASE_DIR"					: "pombase",
+		"WORMBASE_DIR"					: "wormbase"
 	},
 	
 	"FILES" : {
@@ -32,7 +33,9 @@
 		"PSI_DEFINITIONS" 				: "psi-mi25.obo",
 		"SGD_FEATURES" 					: "SGD_features.tab",
 		"CGD_FEATURES" 					: "C_albicans_SC5314_A22_current_chromosomal_feature.tab",
-		"POMBASE_FEATURES"				: "sysID2product.tsv"
+		"POMBASE_FEATURES"				: "sysID2product.tsv",
+		"WORMBASE_DESC"					: "c_elegans.PRJNA13758.WS246.functional_descriptions.txt.gz",
+		"WORMBASE_OTHER"				: "c_elegans.PRJNA13758.WS246.geneOtherIDs.txt.gz"
 	},
 	
 	"DB" : {

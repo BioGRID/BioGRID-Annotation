@@ -31,6 +31,16 @@ class ModelOrganisms( ) :
 			
 		return mappingHash
 		
+	def buildWormbaseLocusIDHash( self ) :
+	
+		self.cursor.execute( "SELECT gene_id, gene_alias_value FROM " + Config.DB_NAME + ".gene_aliases WHERE gene_id IN ( SELECT gene_id FROM " + Config.DB_NAME + ".genes WHERE organism_id='6239' ) AND gene_alias_type='ordered locus'" )
+		
+		mappingHash = {}
+		for row in self.cursor.fetchall( ) :
+			mappingHash[str(row[1]).replace( "CELE_", "" )] = str(row[0])
+			
+		return mappingHash
+		
 	def buildCGDAliasHash( self ) :
 		
 		self.cursor.execute( "SELECT gene_id, gene_alias_value FROM " + Config.DB_NAME + ".gene_aliases WHERE gene_id IN ( SELECT gene_id FROM " + Config.DB_NAME + ".genes WHERE organism_id='237561' )" )
@@ -58,6 +68,7 @@ class ModelOrganisms( ) :
 			aliasSet.add( row[0].strip( ).lower( ) )
 			
 		if "" != orfName and orfName.lower( ) not in aliasSet :
+			self.cursor.execute( "UPDATE " + Config.DB_NAME + ".gene_aliases SET gene_alias_type='synonym' WHERE gene_alias_type='ordered locus' AND gene_id=%s", [geneID] )
 			self.cursor.execute( "INSERT INTO " + Config.DB_NAME + ".gene_aliases VALUES( '0',%s, 'active', 'ordered locus', NOW( ), %s )", [orfName, geneID] )
 			
 		if "" != officialSymbol and officialSymbol.lower( ) not in aliasSet :
@@ -107,7 +118,7 @@ class ModelOrganisms( ) :
 		externalSet = set( )
 		for row in self.cursor.fetchall( ) :
 			externalSet.add( row[0].lower( ) )
-			
+		
 		for external in externals :
 			external = external.strip( )
 			if "" != external and external.lower( ) not in externalSet :
