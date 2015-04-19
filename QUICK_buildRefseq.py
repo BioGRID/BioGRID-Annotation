@@ -139,7 +139,7 @@ with Database.db as cursor :
 			sqlFormat = ",".join( ['%s'] * len(proteinRecord) )
 			
 			if isRefseq or isOrganism :
-				cursor.execute( "SELECT uniprot_id FROM " + Config.DB_QUICK + ".quick_refseq WHERE refseq_id=%s LIMIT 1", [proteinID] )
+				cursor.execute( "SELECT refseq_id FROM " + Config.DB_QUICK + ".quick_refseq WHERE refseq_id=%s LIMIT 1", [proteinID] )
 				proteinExists = cursor.fetchone( )
 				
 				if None == proteinExists :
