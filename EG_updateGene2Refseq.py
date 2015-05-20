@@ -123,7 +123,8 @@ with Database.db as cursor :
 	for missingRefseq in missingRefseqs :
 		refseqSplit = missingRefseq.split( "|" )
 		
-		if "NP" == refseqSplit[0][:2] and int(refseqSplit[2]) in organismList :
+		#if "NP" == refseqSplit[0][:2] and int(refseqSplit[2]) in organismList :
+		if int(refseqSplit[2]) in organismList :
 		
 			cursor.execute( "SELECT refseq_id FROM " + Config.DB_NAME + ".refseq WHERE refseq_accession=%s LIMIT 1", [refseqSplit[0]] )
 			row = cursor.fetchone( )
@@ -155,7 +156,7 @@ with Database.db as cursor :
 		
 			if None == row :
 				print "INSERTING GENE EXTERNAL MAPPING"
-				cursor.execute( "INSERT INTO " + Config.DB_NAME + ".gene_externals VALUES( '0', %s, 'REFSEQ_LEGACY', 'active', NOW( ), %s )", [refseqSplit[0], refseqSplit[1]] )
+				cursor.execute( "INSERT INTO " + Config.DB_NAME + ".gene_externals VALUES( '0', %s, 'REFSEQ-LEGACY', 'active', NOW( ), %s )", [refseqSplit[0], refseqSplit[1]] )
 			else :
 				print "UPDATING GENE EXTERNAL MAPPING"
 				cursor.execute( "UPDATE " + Config.DB_NAME + ".gene_externals SET gene_external_status='active', gene_external_modified=NOW( ) WHERE gene_external_id=%s", [row[0]] )
