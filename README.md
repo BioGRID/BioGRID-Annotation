@@ -135,6 +135,8 @@ Once the annotation database is completed via the steps list above, we generate 
 
 + Run: **python QUICK_buildRefseqIdentifiers.py -all** - This will generate a quick lookup table of refseq protein identifiers.
 
++ Run: **python QUICK_buildChemicalIdentifiers.py -all** - This will generate a quick lookup table for chemical identifiers.
+
 ## Testing
 These calls are mostly for internal BioGRID based testing to validate the final resulting annotation before rolling it out to various different applications within our ecosystem. Likely not of much use to third parties.
 
