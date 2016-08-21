@@ -12,7 +12,7 @@ from classes import Quick
 
 # Process Command Line Input
 argParser = argparse.ArgumentParser( description = 'Update all Annotation Records' )
-argGroup = argParser.add_mutually_exclusive_group( )
+argGroup = argParser.add_mutually_exclusive_group( required=True )
 argGroup.add_argument( '-o', dest='organismID', type = int, nargs = 1, help = 'An organism id to update annotation for', action='store' )
 argGroup.add_argument( '-g', dest='geneID', type = int, nargs = 1, help = 'A Gene ID to Update', action='store' )
 argGroup.add_argument( '-all', dest='allRecords', help = 'Build from All Records, Starting from Scratch', action='store_true' )
@@ -21,6 +21,7 @@ inputArgs = vars( argParser.parse_args( ) )
 isOrganism = False
 isGene = False
 isAll = False
+isPatch = False
 
 if None != inputArgs['organismID'] :
 	isOrganism = True
@@ -154,7 +155,7 @@ with Database.db as cursor :
 			geneExists = cursor.fetchone( )
 			
 			if None == geneExists :
-				cursor.execute( "INSERT INTO " + Config.DB_QUICK + ".quick_annotation VALUES (%s)" % sqlFormat, tuple(geneRecord) )
+				cursor.execute( "INSERT INTO " + Config.DB_QUICK + ".quick_annotation VALUES (%s)" % sqlFormat, tuple(geneRecord) )	
 			else :
 				geneRecord.pop(0)
 				geneRecord.append( geneID )

@@ -61,3 +61,6 @@ config/config.json
 
 # Logs
 logs/
+
+# Patches
+patches/
