@@ -209,3 +209,19 @@ Ensure that the organism is loaded into the _organisms_ table prior to starting
 + Run: **python QUICK_buildRefseq.py -o [BIOGRID ORGANISM ID]** - This will generate a quick lookup table of refseq proteins.
 
 + Run: **python QUICK_buildRefseqIdentifiers.py -o [BIOGRID ORGANISM ID]** - This will generate a quick lookup table of refseq protein identifiers.
+
+#### Adding/Updating a Single Gene Record
+
++ Run: **python QUICK_buildAnnotation.py -g [BIOGRID GENE ID]** - This will append or update the annotation for this gene in the _quick_annotation_ table. 
++ Run: **python QUICK_buildIdentifiers.py -g [BIOGRID GENE ID]** - This will append or update the identifiers for this gene in the _quick_identifiers_ table.
++ Run: **python QUICK_buildRefseq.py -r [BIOGRID REFSEQ ID]** - This will append or update the specific refseq id in the _quick_refseq_ table.
++ Run: **python QUICK_buildRefseqIdentifiers.py -r [BIOGRID REFSEQ ID]** - This will append or update the specific refseq id in the _quick_refseq_identifiers_ table.
+
+#### Building a Database Patch
+When you append or update to the quick lookup tables, you will need to apply a patch to all the other quick annotation tables all over. Use the following procedure as a guide for how to accomplish this...
+
+##### For individual gene patches
+
++ Run: **mysqldump --no-create-info --skip-disable-keys --skip-add-locks --compact --skip-comments -u [USERNAME] -p --where="gene_id='[GENE ID]'" [DB_QUICK] quick_annotation quick_identifiers > patches/[GENE ID].patch.sql** - This will dump out the correct row/rows in quick annotation and quick identifiers related to the gene you need to patch into other databases.
+
++ Run: **mysqldump --no-create-info --skip-disable-keys --skip-add-locks --compact --skip-comments -u [USERNAME] -p --where="refseq_id='[REFSEQ ID]'" [DB_QUICK] quick_refseq quick_refseq_identifiers >> patches/[GENE ID].patch.sql** - This will dump out the correct row/rows in quick refseq and quick refseq identifiers related to the gene you need to patch into other databases.
