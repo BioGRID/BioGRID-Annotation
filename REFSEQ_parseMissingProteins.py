@@ -7,8 +7,11 @@ import sys, string
 import MySQLdb
 import Database
 import glob
+import re
 
 from classes import Refseq
+
+fastaRegex = re.compile( r'^>([A-Z]{2}_[0-9]+)(\.([0-9]+))? (.*) \[(.*)\]$' )
 
 with Database.db as cursor :
 	
@@ -37,13 +40,12 @@ with Database.db as cursor :
 						sequences[currentInfo['ACCESSION']] = currentInfo
 						currentInfo = { }
 						
-					splitHeader = line.split( "|" )
-					currentInfo["GI"] = splitHeader[1].strip( )
-					currentInfo["DESC"] = splitHeader[4].strip( )
-					currentInfo["DESC"] = currentInfo["DESC"][:currentInfo["DESC"].rfind( "[" )].strip( )
-					accessionFull = splitHeader[3].strip( ).split( "." )
-					currentInfo["ACCESSION"] = accessionFull[0]
-					currentInfo["VERSION"] = accessionFull[1]
+					splitHeader = fastaRegex.match( line )
+					
+					currentInfo["GI"] = 0
+					currentInfo["DESC"] = splitHeader.group(4)
+					currentInfo["ACCESSION"] = splitHeader.group(1)
+					currentInfo["VERSION"] = splitHeader.group(3)
 					currentInfo["SEQUENCE"] = []
 					
 				else :
@@ -63,7 +65,7 @@ with Database.db as cursor :
 		
 			if accession in accessionHash :
 				cursor.execute( "UPDATE " + Config.DB_NAME + ".refseq SET refseq_gi=%s, refseq_sequence=%s, refseq_length=%s, refseq_description=%s, refseq_version=%s, refseq_modified=NOW( ), refseq_status='active' WHERE refseq_id=%s", [sequenceInfo['GI'], sequence, sequenceLength, sequenceInfo["DESC"], sequenceInfo["VERSION"], accessionHash[accession]] )
-			
+				
 		Database.db.commit( )
 	
 	cursor.execute( "INSERT INTO " + Config.DB_STATS + ".update_tracker VALUES ( '0', 'REFSEQ_parseMissingProteins', NOW( ) )" )

@@ -13,20 +13,43 @@ from classes import EntrezGene, GeneOntology
 
 # Process Command Line Input
 argParser = argparse.ArgumentParser( description = 'Update all GO from Entrez Gene that are relevant to the organism id passed in via the command line.' )
-argParser.add_argument( '-o', help = 'NCBI Organism ID', type=int, dest = 'organismID', required=True, action='store' )
+argGroup = argParser.add_mutually_exclusive_group( required=True )
+argGroup.add_argument( '-o', help = 'NCBI Organism ID', type=int, dest = 'organismID', action='store' )
+argGroup.add_argument( '-g', dest='genes', nargs = '+', help = 'An Entrez Gene ID List to Update', action='store' )
 inputArgs = vars( argParser.parse_args( ) )
+
+isOrganism = False
+isGene = False
+
+if None != inputArgs['organismID'] :
+	isOrganism = True
+elif None != inputArgs['genes'] :
+	isGene = True
 
 with Database.db as cursor :
 
 	entrezGene = EntrezGene.EntrezGene( Database.db, cursor )
 	geneOntology = GeneOntology.GeneOntology( Database.db, cursor )
 	organismList = entrezGene.fetchEntrezGeneOrganismMapping( )
-	
+	existingEntrezGeneIDs = { }
 	organismID = 0
-	if inputArgs['organismID'] in organismList :
-		organismID = organismList[inputArgs['organismID']]
+	
+	if isOrganism :
+		if inputArgs['organismID'][0] in organismList :
+			organismID = organismList[inputArgs['organismID'][0]]
+			
+		existingEntrezGeneIDs = entrezGene.fetchExistingEntrezGeneIDsByOrganism( organismID )
 		
-	existingEntrezGeneIDs = entrezGene.fetchExistingEntrezGeneIDsByOrganism( organismID )
+	elif isGene :
+	
+		for gene in inputArgs['genes'] :
+			geneID = entrezGene.geneExists( gene )
+		
+			if geneID :
+				existingEntrezGeneIDs[gene] = geneID
+				
+	for entrezGeneID, geneID in existingEntrezGeneIDs.iteritems( ) :		
+		cursor.execute( "UPDATE " + Config.DB_NAME + ".gene_go SET gene_go_status='inactive' WHERE gene_id=%s", [geneID] )
 	
 	insertCount = 0
 	with gzip.open( Config.EG_GENE2GO, 'r' ) as file :
@@ -50,7 +73,6 @@ with Database.db as cursor :
 			if sourceID in existingEntrezGeneIDs :
 			
 				currentGeneID = existingEntrezGeneIDs[sourceID]
-				cursor.execute( "UPDATE " + Config.DB_NAME + ".gene_go SET gene_go_status='inactive' WHERE gene_id=%s", [currentGeneID] )
 					
 				if "-" != goEvidence :
 					insertCount = insertCount + 1
