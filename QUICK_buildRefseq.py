@@ -15,17 +15,21 @@ argParser = argparse.ArgumentParser( description = 'Update all Annotation Record
 argGroup = argParser.add_mutually_exclusive_group( )
 argGroup.add_argument( '-o', dest='organismID', type = int, nargs = 1, help = 'An organism id to update annotation for', action='store' )
 argGroup.add_argument( '-r', dest='refseqID', type = int, nargs = 1, help = 'A Refseq ID to Update', action='store' )
+argGroup.add_argument( '-d', dest='dateVal', type = str, nargs = 1, help = 'A date value (YYYY-MM-DD 00:00:00)', action='store' )
 argGroup.add_argument( '-all', dest='allRecords', help = 'Build from All Records, Starting from Scratch', action='store_true' )
 inputArgs = vars( argParser.parse_args( ) )
 
 isOrganism = False
 isRefseq = False
+isDate = False
 isAll = False
 
 if None != inputArgs['organismID'] :
 	isOrganism = True
 elif None != inputArgs['refseqID'] :
 	isRefseq = True
+elif None != inputArgs['dateVal'] :
+	isDate = True
 else :
 	isAll = True
 
@@ -39,6 +43,9 @@ with Database.db as cursor :
 	
 	elif isRefseq :
 		cursor.execute( "SELECT * FROM " + Config.DB_NAME + ".refseq WHERE refseq_id=%s AND refseq_status='active'", [inputArgs['refseqID']] )
+		
+	elif isDate :
+		cursor.execute( "SELECT * FROM " + Config.DB_NAME + ".refseq WHERE refseq_modified>%s AND refseq_status='active'", [inputArgs['dateVal']] )
 	
 	else :
 		cursor.execute( "TRUNCATE TABLE " + Config.DB_QUICK + ".quick_refseq" )
@@ -138,7 +145,7 @@ with Database.db as cursor :
 			
 			sqlFormat = ",".join( ['%s'] * len(proteinRecord) )
 			
-			if isRefseq or isOrganism :
+			if isRefseq or isOrganism or isDate :
 				cursor.execute( "SELECT refseq_id FROM " + Config.DB_QUICK + ".quick_refseq WHERE refseq_id=%s LIMIT 1", [proteinID] )
 				proteinExists = cursor.fetchone( )
 				
