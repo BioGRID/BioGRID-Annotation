@@ -15,11 +15,13 @@ argParser = argparse.ArgumentParser( description = 'Update all Annotation Record
 argGroup = argParser.add_mutually_exclusive_group( required=True )
 argGroup.add_argument( '-o', dest='organismID', type = int, nargs = 1, help = 'An organism id to update annotation for', action='store' )
 argGroup.add_argument( '-g', dest='geneID', type = int, nargs = 1, help = 'A Gene ID to Update', action='store' )
+argGroup.add_argument( '-d', dest='dateVal', type = str, nargs = 1, help = 'A date value (YYYY-MM-DD 00:00:00)', action='store' )
 argGroup.add_argument( '-all', dest='allRecords', help = 'Build from All Records, Starting from Scratch', action='store_true' )
 inputArgs = vars( argParser.parse_args( ) )
 
 isOrganism = False
 isGene = False
+isDate = False
 isAll = False
 isPatch = False
 
@@ -27,6 +29,8 @@ if None != inputArgs['organismID'] :
 	isOrganism = True
 elif None != inputArgs['geneID'] :
 	isGene = True
+elif None != inputArgs['dateVal'] :
+	isDate = True
 else :
 	isAll = True
 
@@ -40,6 +44,9 @@ with Database.db as cursor :
 	
 	elif isGene :
 		cursor.execute( "SELECT * FROM " + Config.DB_NAME + ".genes WHERE gene_id=%s AND gene_status='active'", [inputArgs['geneID']] )
+		
+	elif isDate :
+		cursor.execute( "SELECT * FROM " + Config.DB_NAME + ".genes WHERE gene_updated>%s AND gene_status='active'", [inputArgs['dateVal']] )
 	
 	else :
 		cursor.execute( "TRUNCATE TABLE " + Config.DB_QUICK + ".quick_annotation" )
@@ -150,7 +157,7 @@ with Database.db as cursor :
 		
 		sqlFormat = ",".join( ['%s'] * len(geneRecord) )
 	
-		if isGene or isOrganism :
+		if isGene or isOrganism or isDate :
 			cursor.execute( "SELECT gene_id FROM " + Config.DB_QUICK + ".quick_annotation WHERE gene_id=%s LIMIT 1", [geneID] )
 			geneExists = cursor.fetchone( )
 			
