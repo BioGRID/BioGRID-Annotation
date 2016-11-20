@@ -225,3 +225,6 @@ When you append or update to the quick lookup tables, you will need to apply a p
 + Run: **mysqldump --no-create-info --skip-disable-keys --skip-add-locks --compact --skip-comments -u [USERNAME] -p --where="gene_id='[GENE ID]'" [DB_QUICK] quick_annotation quick_identifiers > patches/[GENE ID].patch.sql** - This will dump out the correct row/rows in quick annotation and quick identifiers related to the gene you need to patch into other databases.
 
 + Run: **mysqldump --no-create-info --skip-disable-keys --skip-add-locks --compact --skip-comments -u [USERNAME] -p --where="refseq_id='[REFSEQ ID]'" [DB_QUICK] quick_refseq quick_refseq_identifiers >> patches/[GENE ID].patch.sql** - This will dump out the correct row/rows in quick refseq and quick refseq identifiers related to the gene you need to patch into other databases.
+
+### Parsing in a single gene
+Refer to the procedure for adding a new organism, except most scripts support the -g option, which allows you to specify entrez gene ids

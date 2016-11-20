@@ -10,17 +10,17 @@ import Database
 import urllib, urllib2
 import time, traceback
 
-searchURL = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
+searchURL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
 
 searchData = { }
 searchData["db"] = "protein"
-searchData["retmode"] = "fasta"
-searchData["rettype"] = "text"
+searchData["retmode"] = "text"
+searchData["rettype"] = "fasta"
 searchData["email"] = Config.APP_EMAIL
 searchData["tool"] = Config.APP_TOOL
 
 MAX_ITERATIONS = 10
-MAX_PER = 100
+MAX_PER = 500
 
 with Database.db as cursor :
 

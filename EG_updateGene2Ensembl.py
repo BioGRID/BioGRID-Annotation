@@ -13,19 +13,43 @@ from classes import EntrezGene
 
 # Process Command Line Input
 argParser = argparse.ArgumentParser( description = 'Update all Ensembl External IDs from Entrez Gene that are relevant to the organism id passed in via the command line.' )
-argParser.add_argument( '-o', help = 'NCBI Organism ID', type=int, dest = 'organismID', required=True, action='store' )
+argGroup = argParser.add_mutually_exclusive_group( required=True )
+argGroup.add_argument( '-o', help = 'NCBI Organism ID', type=int, dest = 'organismID', action='store' )
+argGroup.add_argument( '-g', dest='genes', nargs = '+', help = 'An Entrez Gene ID List to Update', action='store' )
 inputArgs = vars( argParser.parse_args( ) )
+
+isOrganism = False
+isGene = False
+
+if None != inputArgs['organismID'] :
+	isOrganism = True
+elif None != inputArgs['genes'] :
+	isGene = True
 
 with Database.db as cursor :
 
 	entrezGene = EntrezGene.EntrezGene( Database.db, cursor )
 	organismList = entrezGene.fetchEntrezGeneOrganismMapping( )
-	
+	existingEntrezGeneIDs = { }
 	organismID = 0
-	if inputArgs['organismID'] in organismList :
-		organismID = organismList[inputArgs['organismID']]
+	
+	if isOrganism :
+		if inputArgs['organismID'][0] in organismList :
+			organismID = organismList[inputArgs['organismID'][0]]
+			
+		existingEntrezGeneIDs = entrezGene.fetchExistingEntrezGeneIDsByOrganism( organismID )
 		
-	existingEntrezGeneIDs = entrezGene.fetchExistingEntrezGeneIDsByOrganism( organismID )
+	elif isGene :
+	
+		for gene in inputArgs['genes'] :
+			geneID = entrezGene.geneExists( gene )
+		
+			if geneID :
+				existingEntrezGeneIDs[gene] = geneID
+				
+	for entrezGeneID, geneID in existingEntrezGeneIDs.iteritems( ) :
+		cursor.execute( "UPDATE " + Config.DB_NAME + ".gene_externals SET gene_external_status='inactive' WHERE gene_id=%s AND gene_external_source = 'ENSEMBL'", [geneID] )
+				
 	ensemblHash = entrezGene.fetchEnsemblHash( )
 	
 	insertCount = 0
@@ -49,7 +73,6 @@ with Database.db as cursor :
 			
 				insertCount = insertCount + 1
 				currentGeneID = existingEntrezGeneIDs[sourceID]
-				cursor.execute( "UPDATE " + Config.DB_NAME + ".gene_externals SET gene_external_status='inactive' WHERE gene_id=%s AND gene_external_source = 'ENSEMBL'", [currentGeneID] )
 
 				if "-" != ensemblGeneID and ensemblGeneID.upper( ) not in ensemblHash :
 				
